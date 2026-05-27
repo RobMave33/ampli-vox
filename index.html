@@ -424,6 +424,103 @@ body::before{
 .tip strong{color:var(--accent);}
 
 /* ══════════════════════════════════════
+   VT20+ FAITHFUL PANEL
+══════════════════════════════════════ */
+.vt-panel{
+  display:flex;flex-direction:column;gap:14px;
+  padding-top:6px;
+}
+.vt-row{
+  display:flex;gap:18px;align-items:flex-start;
+  padding-bottom:8px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.vt-row::-webkit-scrollbar{height:3px;}
+.vt-row::-webkit-scrollbar-thumb{background:var(--accent-line);border-radius:2px;}
+.vt-row::-webkit-scrollbar-track{background:rgba(0,0,0,.2);}
+
+.vt-cap{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--accent);letter-spacing:2px;text-transform:uppercase;text-align:center;}
+.vt-cap-mini{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:#8a7848;letter-spacing:1.2px;text-transform:uppercase;text-align:center;line-height:1.4;}
+
+/* AMP block (the big selector with model names) */
+.vt-amp-block{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:8px 6px;border:1px solid rgba(232,160,32,.18);border-radius:8px;
+  background:rgba(0,0,0,.18);min-width:230px;flex-shrink:0;
+}
+.vt-amp-btn-row{display:flex;align-items:center;gap:8px;margin-top:4px;}
+
+/* Control column (preset / manual buttons) */
+.vt-control-col{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:10px 8px;border:1px solid #2a2510;border-radius:8px;
+  background:rgba(0,0,0,.2);min-width:90px;flex-shrink:0;
+}
+.vt-led-stack{display:flex;flex-direction:column;align-items:center;gap:4px;}
+
+/* LEDs */
+.vt-led{width:8px;height:8px;border-radius:50%;background:#1a1408;transition:background .2s,box-shadow .2s;flex-shrink:0;}
+.vt-led.green.on{background:#4ade80;box-shadow:0 0 7px #4ade80;}
+.vt-led.orange.on{background:#f0a830;box-shadow:0 0 7px #f0a830;}
+.vt-led.red.on{background:#d63b3b;box-shadow:0 0 7px #d63b3b;}
+.vt-led.off{background:#2a1c10;}
+
+/* Buttons */
+.vt-btn-circle{
+  width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #555, #1a1a1a);
+  border:1px solid #0a0a0a;box-shadow:inset 0 1px 1px rgba(255,255,255,.1);
+  flex-shrink:0;
+}
+.vt-btn-lbl{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;text-align:center;}
+
+/* EQ knobs row */
+.vt-eq-row{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:8px 10px;border:1px solid rgba(232,160,32,.12);border-radius:8px;
+  background:rgba(0,0,0,.18);flex:1;min-width:max-content;
+}
+.vt-knob-cell{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:62px;}
+.vt-knob-svg{line-height:0;}
+.vt-knob-lbl{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:#8a7848;letter-spacing:1.2px;text-transform:uppercase;}
+.vt-knob-val{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--cream);letter-spacing:1px;}
+
+/* FX row */
+.vt-row-fx{align-items:flex-start;}
+.vt-fx-group{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:8px 6px;border:1px solid #2a2510;border-radius:8px;background:rgba(0,0,0,.2);
+  flex-shrink:0;
+}
+.vt-fx-side{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:flex-start;flex-shrink:0;padding-top:18px;}
+.vt-fx-divider{width:1px;background:#2a2510;align-self:stretch;margin:8px 0;flex-shrink:0;}
+.vt-fx-status{
+  font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:1.2px;
+  padding:2px 8px;border-radius:3px;margin-top:2px;
+}
+.vt-fx-status.on{background:rgba(74,222,128,.15);color:var(--ok);border:1px solid rgba(74,222,128,.4);}
+.vt-fx-status.off{background:rgba(60,60,60,.15);color:var(--muted);border:1px solid var(--border);}
+
+.vt-tap-cell{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.vt-tap-time{font-family:'Bebas Neue',sans-serif;font-size:.8rem;color:var(--accent);letter-spacing:.5px;margin-top:3px;}
+
+/* FOOT */
+.vt-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 4px 2px;border-top:1px solid #3a3020;
+}
+.vt-foot-brand{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:4px;color:var(--cream);}
+.vt-foot-brand span{color:var(--accent);}
+.vt-foot-jacks{display:flex;gap:14px;}
+.vt-jack-cell{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.vt-jack-cell span{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--muted);letter-spacing:1px;}
+.vt-jack{
+  width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 50% 50%, #0a0a0a 0%, #0a0a0a 35%, #3a3a3a 50%, #1a1a1a 100%);
+  border:1px solid #0a0a0a;box-shadow:inset 0 0 4px rgba(0,0,0,.8);
+}
+
+/* ══════════════════════════════════════
    TOAST
 ══════════════════════════════════════ */
 .toast{
@@ -513,10 +610,8 @@ body::before{
         <div class="amp-brand">VOX<span>VT20+</span></div>
         <div class="amp-model-tag" id="dModel">—</div>
       </div>
-      <div class="sub-lbl">AMPLI — glisse pour voir tous les potards →</div>
-      <div class="knob-scroll"><div class="knobs-row" id="row1"></div></div>
-      <div class="sub-lbl">EFFETS</div>
-      <div class="fx-grid" id="fxGrid"></div>
+      <div class="sub-lbl">FAÇADE — glisse horizontalement si nécessaire →</div>
+      <div class="vt-panel" id="vtPanel"></div>
     </div>
     <div class="guitar-card">
       <div class="guitar-card-title">🎸 Réglages Guitare <span>FENDER AM. SPECIAL STRAT</span></div>
@@ -613,6 +708,198 @@ function kSvg(v, sz) {
   </svg>`;
 }
 
+/* ── VT20+ OPTIONS ────────────────────────────────── */
+const AMP_MODELS = ['CLEAN','CALI CLEAN','US BLUES','US 2x12','VOX AC15','VOX AC30','UK ROCK','UK METAL','US HIGH GAIN','US METAL','BOUTIQUE METAL'];
+const PEDAL_TYPES = ['OFF','COMP','ACOUSTIC','AUTO WAH','U-VIBE','BRN OCTAVE','TREBLE BOOST','TUBE OD','GOLD DRIVE','ORG DIST','METAL DIST','FUZZ'];
+const MOD_TYPES = ['OFF','CE CHORUS','MULTI CHORUS','FLANGER','ORG PHASE','TWIN TREM','G4 ROTARY','PITCH SHIFT','FILTRON','TAPE ECHO','DELAY','CHORUS+DELAY'];
+const REVERB_TYPES = ['OFF','ROOM','SPRING','HALL'];
+
+/* ── CHICKENHEAD KNOB (cream, for EQ) ─────────────── */
+function chickenKnobSvg(v, sz) {
+  sz = sz || 64; v = Math.max(0, Math.min(10, v));
+  const pct = v / 10, sa = 135, arc = 270, ang = sa + pct * arc;
+  const r = sz * .36, cx = sz / 2, cy = sz / 2;
+  const id = 'ck' + Math.random().toString(36).slice(2, 7);
+  const ka = (ang - 90) * Math.PI / 180;
+  const px2 = cx + r * 0.95 * Math.cos(ka);
+  const py2 = cy + r * 0.95 * Math.sin(ka);
+  // outer tick ring
+  const xy = (d, rr) => { const a = (d - 90) * Math.PI / 180; return { x: cx + rr * Math.cos(a), y: cy + rr * Math.sin(a) }; };
+  const arc2 = (s, e, rr) => { const a = xy(s, rr), bb = xy(e, rr), lg = (e - s) > 180 ? 1 : 0; return `M${a.x.toFixed(2)} ${a.y.toFixed(2)}A${rr} ${rr} 0 ${lg} 1 ${bb.x.toFixed(2)} ${bb.y.toFixed(2)}`; };
+  const col = v >= 7 ? '#f0a830' : v >= 4 ? '#c87010' : '#5a4010';
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="${id}" cx="35%" cy="28%"><stop offset="0%" stop-color="#f4ecd4"/><stop offset="55%" stop-color="#d6c69a"/><stop offset="100%" stop-color="#9a8a60"/></radialGradient></defs>
+    <path d="${arc2(sa, sa + arc, r + 4)}" fill="none" stroke="#1c160a" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="${arc2(sa, ang, r + 4)}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="${r + 1}" fill="#0a0804"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${id})" stroke="#5a4820" stroke-width="0.6"/>
+    <line x1="${cx}" y1="${cy}" x2="${px2.toFixed(1)}" y2="${py2.toFixed(1)}" stroke="#1a1408" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="${r * 0.18}" fill="#1a1408"/>
+  </svg>`;
+}
+
+/* ── ROTARY SELECTOR SVG ─────────────────────────── */
+function selectorSvg(labels, activeIdx, sz, opts) {
+  opts = opts || {};
+  sz = sz || 180;
+  const cx = sz/2, cy = sz/2;
+  const knobR = sz * 0.155;
+  const dotR = sz * 0.34;
+  const textR = sz * 0.44;
+  const n = labels.length;
+  const startA = 135, arcSpan = 270;
+  const step = n > 1 ? arcSpan/(n-1) : 0;
+  const knobAng = startA + (activeIdx >= 0 ? activeIdx : 0) * step;
+  const accent = opts.accent || '#f0a830';
+  const cream = opts.cream !== false;
+
+  let dots = '', texts = '';
+  for (let i = 0; i < n; i++) {
+    const a = (startA + i*step - 90) * Math.PI/180;
+    const dx = cx + dotR*Math.cos(a), dy = cy + dotR*Math.sin(a);
+    const tx = cx + textR*Math.cos(a), ty = cy + textR*Math.sin(a);
+    const active = i === activeIdx;
+    const col = active ? accent : '#6a5c30';
+    dots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${active?2.6:1.7}" fill="${col}"${active?` style="filter:drop-shadow(0 0 4px ${accent})"`:''}/>`;
+    const fs = Math.max(6.5, sz*0.045);
+    texts += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="${fs}" font-weight="${active?'700':'400'}" fill="${active?accent:'#8a7848'}">${escapeHtml(labels[i])}</text>`;
+  }
+
+  const ka = (knobAng - 90) * Math.PI/180;
+  const px1 = cx + knobR*0.15 * Math.cos(ka);
+  const py1 = cy + knobR*0.15 * Math.sin(ka);
+  const px2 = cx + knobR*0.88 * Math.cos(ka);
+  const py2 = cy + knobR*0.88 * Math.sin(ka);
+  const id = 'sk' + Math.random().toString(36).slice(2,7);
+
+  const fillKnob = cream
+    ? `<radialGradient id="${id}" cx="35%" cy="28%"><stop offset="0%" stop-color="#f0e8d0"/><stop offset="100%" stop-color="#a89878"/></radialGradient>`
+    : `<radialGradient id="${id}" cx="35%" cy="28%"><stop offset="0%" stop-color="#52473a"/><stop offset="100%" stop-color="#1c1a15"/></radialGradient>`;
+  const pointerCol = cream ? '#2a1808' : '#ddc878';
+
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">
+    <defs>${fillKnob}</defs>
+    ${dots}
+    ${texts}
+    <circle cx="${cx}" cy="${cy}" r="${knobR+1.5}" fill="#0a0804"/>
+    <circle cx="${cx}" cy="${cy}" r="${knobR}" fill="url(#${id})" stroke="#3a2a10" stroke-width="0.8"/>
+    <line x1="${px1.toFixed(1)}" y1="${py1.toFixed(1)}" x2="${px2.toFixed(1)}" y2="${py2.toFixed(1)}" stroke="${pointerCol}" stroke-width="2.2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ── BUILD FAITHFUL VT20+ PANEL ────────────────────── */
+function buildPanel(d) {
+  const b = d.bank || 'STD';
+  const bankColors = { STD: '#4ade80', SPL: '#f0a830', CST: '#d63b3b' };
+  const bankLed = { STD: 'green', SPL: 'orange', CST: 'red' };
+  const ampIdx = AMP_MODELS.indexOf(d.ampModel);
+  const pedalIdx = PEDAL_TYPES.indexOf(d.pedalOn ? d.pedal : 'OFF');
+  const modVal = d.modOn ? d.modType : (d.delayOn ? (MOD_TYPES.includes(d.modType) ? d.modType : 'DELAY') : 'OFF');
+  const modIdx = MOD_TYPES.indexOf(modVal);
+  const reverbIdx = REVERB_TYPES.indexOf(d.reverbOn ? d.reverb : 'OFF');
+  const presetLedOn = !!d.factoryPreset;
+  const manualLedOn = !d.factoryPreset;
+  const pedalValue = typeof d.pedalValue === 'number' ? d.pedalValue : (d.pedalOn ? 5 : 0);
+  const depthVal = Math.round((d.modDepth || 0) / 10);
+  const tapLedOn = d.delayOn || (d.modOn && d.modSpeed > 0);
+
+  const eqRow = ['gain','volume','treble','middle','bass','master'].map(k =>
+    `<div class="vt-knob-cell"><div class="vt-knob-svg">${chickenKnobSvg(d[k], 62)}</div><div class="vt-knob-lbl">${k.toUpperCase()}</div><div class="vt-knob-val">${d[k]}</div></div>`
+  ).join('');
+
+  return `
+    <!-- TOP ROW : Preset/Manual LEDs + AMP Selector + AMP button + EQ knobs -->
+    <div class="vt-row vt-row-main">
+      <div class="vt-control-col">
+        <div class="vt-cap-mini">99 PRESETS</div>
+        <div class="vt-led-stack">
+          <div class="vt-led ${presetLedOn ? 'red on' : 'off'}" title="PRESET LED"></div>
+          <div class="vt-btn-circle" title="Bouton PRESET"></div>
+          <div class="vt-btn-lbl">PRESET</div>
+        </div>
+        <div class="vt-led-stack">
+          <div class="vt-led ${manualLedOn ? 'orange on' : 'off'}" title="MANUAL LED"></div>
+          <div class="vt-btn-lbl">MANUAL</div>
+        </div>
+        <div class="vt-cap-mini" style="opacity:.5;font-size:.45rem;line-height:1.5;">
+          GRN:BASIC<br>ORG:EFFECT<br>RED:SONG
+        </div>
+      </div>
+
+      <div class="vt-amp-block">
+        <div class="vt-cap">33 AMPS</div>
+        <div class="vt-sel-wrap" style="width:200px;height:200px;">${selectorSvg(AMP_MODELS, ampIdx, 200, {cream:true})}</div>
+        <div class="vt-amp-btn-row">
+          <div class="vt-led ${bankLed[b]} on" title="Bank LED"></div>
+          <div class="vt-btn-circle" title="Bouton AMP"></div>
+          <div class="vt-btn-lbl">AMP</div>
+        </div>
+        <div class="vt-cap-mini" style="opacity:.55;">GRN:STD · ORG:SPL · RED:CST</div>
+      </div>
+
+      <div class="vt-eq-row">${eqRow}</div>
+    </div>
+
+    <!-- BOTTOM ROW : PEDAL + VALUE + MOD/DELAY + DEPTH/TAP + REVERB -->
+    <div class="vt-row vt-row-fx">
+      <div class="vt-fx-group">
+        <div class="vt-cap">PEDAL</div>
+        <div class="vt-sel-wrap" style="width:140px;height:140px;">${selectorSvg(PEDAL_TYPES, pedalIdx, 140, {cream:false})}</div>
+        <div class="vt-fx-status ${d.pedalOn?'on':'off'}">${d.pedalOn ? 'ON' : 'OFF'}</div>
+      </div>
+
+      <div class="vt-fx-side">
+        <div class="vt-knob-cell">
+          <div class="vt-knob-svg">${kSvg(pedalValue, 48)}</div>
+          <div class="vt-knob-lbl">VALUE</div>
+          <div class="vt-knob-val">${pedalValue}</div>
+          <div class="vt-cap-mini" style="opacity:.45;margin-top:2px;">NR.SENS</div>
+        </div>
+      </div>
+
+      <div class="vt-fx-divider"></div>
+
+      <div class="vt-fx-group">
+        <div class="vt-cap">G4 ROTARY · MOD/DELAY</div>
+        <div class="vt-sel-wrap" style="width:140px;height:140px;">${selectorSvg(MOD_TYPES, modIdx, 140, {cream:false})}</div>
+        <div class="vt-fx-status ${(d.modOn||d.delayOn)?'on':'off'}">${(d.modOn||d.delayOn) ? 'ON' : 'OFF'}</div>
+      </div>
+
+      <div class="vt-fx-side">
+        <div class="vt-knob-cell">
+          <div class="vt-knob-svg">${kSvg(depthVal, 48)}</div>
+          <div class="vt-knob-lbl">DEPTH</div>
+          <div class="vt-knob-val">${depthVal}</div>
+        </div>
+        <div class="vt-tap-cell">
+          <div class="vt-led ${tapLedOn?'red on':'off'}" title="TAP LED"></div>
+          <div class="vt-btn-circle"></div>
+          <div class="vt-btn-lbl">TAP</div>
+          ${d.delayOn ? `<div class="vt-tap-time">${d.delayTime}ms</div>` : ''}
+          <div class="vt-cap-mini" style="opacity:.5;margin-top:3px;">HOLD:SPEED</div>
+        </div>
+      </div>
+
+      <div class="vt-fx-divider"></div>
+
+      <div class="vt-fx-group">
+        <div class="vt-cap">REVERB</div>
+        <div class="vt-sel-wrap" style="width:120px;height:120px;">${selectorSvg(REVERB_TYPES, reverbIdx, 120, {cream:false})}</div>
+        ${d.reverbOn ? `<div class="vt-fx-status on">MIX ${d.reverbMix}%</div>` : `<div class="vt-fx-status off">OFF</div>`}
+      </div>
+    </div>
+
+    <!-- FOOT: brand + jacks -->
+    <div class="vt-foot">
+      <div class="vt-foot-brand">VOX <span>VT20+</span></div>
+      <div class="vt-foot-jacks">
+        <div class="vt-jack-cell"><div class="vt-jack"></div><span>PHONES</span></div>
+        <div class="vt-jack-cell"><div class="vt-jack"></div><span>AUX IN</span></div>
+      </div>
+    </div>
+  `;
+}
+
 /* ── PICKUP SWITCH ────────────────────────────────── */
 const PU_SHORT = ['M', 'IM', 'Ø', 'IC', 'C'];
 function pickupHtml(pos) {
@@ -624,7 +911,7 @@ const P = {
   nirvana: { title: "Smells Like Teen Spirit", artist: "Nirvana", genre: "Grunge",
     ampModel: "BOUTIQUE METAL", bank: "SPL", factoryPreset: true, ampReal: "ENGL Powerball (canal Heavy)",
     gain: 8, volume: 6, treble: 6, middle: 4, bass: 6, master: 6,
-    pedal: "COMP", pedalOn: false, modType: "CHORUS", modOn: true, modDepth: 40, modSpeed: 30,
+    pedal: "COMP", pedalOn: false, modType: "CE CHORUS", modOn: true, modDepth: 40, modSpeed: 30,
     delayOn: true, delayTime: 280, delayFb: 20, reverb: "ROOM", reverbOn: true, reverbMix: 20,
     guitar: { pickup: 1, tone: 6, volume: 10, note: "Micro manche pour adoucir le son brillant des Texas Special. Tone à 6 pour réduire la brillance." },
     guitarNote: "Micro <strong>manche</strong> pour adoucir les Texas Special. Les single coils captent beaucoup de bruit à ce gain — active NR SENS sur l'ampli.",
@@ -819,21 +1106,7 @@ function render(d) {
   if (d.guitarNote) { an.innerHTML = '🎸 ' + d.guitarNote; an.style.display = 'block'; }
   else an.style.display = 'none';
 
-  const r1 = document.getElementById('row1');
-  let h = `<div class="sel-g"><div class="sel-lbl">Sélecteur (33 AMPS) · Bouton AMP : ${bankNames[b]}</div><div class="sel-val" style="border-color:${bankColors[b]}88;color:${bankColors[b]};">${escapeHtml(d.ampModel)}<br><span style="font-size:.56rem;opacity:.6;color:var(--cream)">${escapeHtml(d.ampReal)}</span></div></div><div class="ksep"></div>`;
-  ['gain', 'volume', 'treble', 'middle', 'bass', 'master'].forEach(k => {
-    h += `<div class="knob-g">${kSvg(d[k], 62)}<div class="k-lbl">${k.toUpperCase()}</div><div class="k-val">${d[k]}</div></div>`;
-  });
-  r1.innerHTML = h;
-
-  const fg = document.getElementById('fxGrid');
-  const fxArr = [
-    { name: 'PEDAL', on: d.pedalOn, main: d.pedal, sub: '' },
-    { name: 'G4 ROTARY', on: d.modOn, main: d.modType, sub: d.modOn && d.modDepth ? `Depth ${Math.round(d.modDepth / 10)} · Speed ${Math.round(d.modSpeed / 10)}` : '' },
-    { name: 'MOD / DELAY', on: d.delayOn, main: d.delayOn ? d.delayTime + 'ms' : '—', sub: d.delayOn ? `Feedback ${Math.round(d.delayFb / 10)} · TAP TEMPO` : '' },
-    { name: 'REVERB', on: d.reverbOn, main: d.reverbOn ? d.reverb : 'OFF', sub: d.reverbOn ? `Mix ${d.reverbMix}%` : '' }
-  ];
-  fg.innerHTML = fxArr.map(f => `<div class="fx-card${f.on ? ' on' : ''}"><div class="fx-top"><div class="fx-name">${f.name}</div><div class="badge ${f.on ? 'on' : 'off'}">${f.on ? 'ON' : 'OFF'}</div></div><div class="fx-body"><strong>${f.main}</strong>${f.sub ? '<br>' + f.sub : ''}</div></div>`).join('');
+  document.getElementById('vtPanel').innerHTML = buildPanel(d);
 
   const g = d.guitar;
   const gc = document.getElementById('guitarControls');
