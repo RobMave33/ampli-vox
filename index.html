@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="VOX Tone">
 <meta name="theme-color" content="#0b0b0c">
-<title>VOX VT40+ · Tone Matcher</title>
+<title>VOX VT20+ · Tone Matcher</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -397,13 +397,13 @@ body::before{
 <!-- ══ API SCREEN ══ -->
 <div id="apiScreen">
   <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-    <div class="api-brand"><span class="vox">VOX</span><span class="vt">VT40+</span></div>
+    <div class="api-brand"><span class="vox">VOX</span><span class="vt">VT20+</span></div>
     <div class="api-tagline">Tone Matcher · Strat Edition</div>
   </div>
   <div class="api-card">
     <div class="api-heading"><span class="dot"></span>Clé API OpenAI</div>
     <div class="api-desc">
-      L'app utilise <strong>GPT-4o</strong> (OpenAI) pour analyser n'importe quel morceau et te donner les réglages VOX VT40+ adaptés à ta Strat.<br><br>
+      L'app utilise <strong>GPT-4o</strong> (OpenAI) pour analyser n'importe quel morceau et te donner les réglages VOX VT20+ (combo 30W, 11 modèles × 3 banques STD/SPL/CST) adaptés à ta Strat.<br><br>
       Ta clé reste <strong>uniquement sur cet appareil</strong> (localStorage). Elle n'est jamais envoyée ailleurs qu'à l'API OpenAI.<br><br>
       Obtiens ta clé sur <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com → API Keys</a>.
     </div>
@@ -463,7 +463,7 @@ body::before{
     <div class="adapt-note" id="adaptNote"></div>
     <div class="amp-wrap">
       <div class="amp-brand-bar">
-        <div class="amp-brand">VOX<span>VT40+</span></div>
+        <div class="amp-brand">VOX<span>VT20+</span></div>
         <div class="amp-model-tag" id="dModel">—</div>
       </div>
       <div class="sub-lbl">AMPLI — glisse pour voir tous les potards →</div>
@@ -575,7 +575,7 @@ function pickupHtml(pos) {
 /* ── PRESETS ──────────────────────────────────────── */
 const P = {
   nirvana: { title: "Smells Like Teen Spirit", artist: "Nirvana", genre: "Grunge",
-    ampModel: "UK MODERN", ampReal: "Marshall JCM2000 DSL",
+    ampModel: "BOUTIQUE METAL", bank: "SPL", factoryPreset: true, ampReal: "ENGL Powerball (canal Heavy)",
     gain: 8, volume: 6, treble: 6, middle: 4, bass: 6, master: 6,
     pedal: "COMP", pedalOn: false, modType: "CHORUS", modOn: true, modDepth: 40, modSpeed: 30,
     delayOn: true, delayTime: 280, delayFb: 20, reverb: "ROOM", reverbOn: true, reverbMix: 20,
@@ -588,7 +588,7 @@ const P = {
     tip: "💡 <strong>Strat + médiator épais :</strong> Ton TREBLE est déjà naturellement élevé avec les Texas Special — garde-le à 6 max. Cobain jouait en Jaguar/Mustang mais ta Strat s'en approche bien avec le micro manche. NS-2 quasi-obligatoire à ce gain."
   },
   acdc: { title: "Back in Black", artist: "AC/DC", genre: "Hard Rock",
-    ampModel: "UK VINTAGE", ampReal: "Marshall Plexi 1959 SLP",
+    ampModel: "US 2x12", bank: "CST", factoryPreset: true, ampReal: "Fender Twin modifié actif crunch",
     gain: 6, volume: 7, treble: 7, middle: 7, bass: 5, master: 7,
     pedal: "TUBE OD", pedalOn: false, modType: "OFF", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: false, delayTime: 0, delayFb: 0, reverb: "SPRING", reverbOn: true, reverbMix: 15,
@@ -600,7 +600,7 @@ const P = {
     tip: "💡 <strong>Strat + médiator épais :</strong> Ton médiator épais est parfait pour les riffs rythmiques bien définis d'Angus. Le son AC/DC est dans le jeu plus que dans les effets — peu de gain, volume fort, MASTER élevé pour saturer l'ampli naturellement."
   },
   hendrix: { title: "Purple Haze", artist: "Jimi Hendrix", genre: "Psychédélique",
-    ampModel: "UK BLUES", ampReal: "Marshall JTM45",
+    ampModel: "UK ROCK", bank: "STD", ampReal: "Marshall JTM45 tweed 45W",
     gain: 7, volume: 6, treble: 6, middle: 6, bass: 5, master: 6,
     pedal: "ORG DIST", pedalOn: false, modType: "ORG PHASE", modOn: true, modDepth: 65, modSpeed: 45,
     delayOn: true, delayTime: 350, delayFb: 25, reverb: "SPRING", reverbOn: true, reverbMix: 30,
@@ -614,7 +614,7 @@ const P = {
     tip: "💡 <strong>Tu as la même guitare que Hendrix !</strong> Ordre de branchement : Guitare → Fuzz Face → Wah → <strong>ORG PHASE</strong> (G4 Rotary) → Ampli. Réverb <strong>SPRING</strong> indispensable pour le son 60s."
   },
   metallica: { title: "Enter Sandman", artist: "Metallica", genre: "Metal",
-    ampModel: "US HIGAIN", ampReal: "Mesa Boogie Mark IIC+",
+    ampModel: "UK METAL", bank: "STD", factoryPreset: true, ampReal: "Marshall JCM2000 DSL 100W",
     gain: 9, volume: 5, treble: 7, middle: 3, bass: 7, master: 6,
     pedal: "TUBE OD", pedalOn: true, modType: "OFF", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: false, delayTime: 0, delayFb: 0, reverb: "ROOM", reverbOn: false, reverbMix: 0,
@@ -627,7 +627,7 @@ const P = {
     tip: "💡 <strong>Single coils + métal :</strong> Active <strong>TUBE OD</strong> dans Pedal (simule le boosteur TS). MIDDLE très bas pour le son scooped. Le <strong>NR SENS</strong> sur l'ampli + NS-2 en pédale sont indispensables. Micro <strong>chevalet</strong>, volume et tone à fond."
   },
   pinkfloyd: { title: "Comfortably Numb", artist: "Pink Floyd", genre: "Rock Prog",
-    ampModel: "UK BLUES", ampReal: "Hiwatt DR103",
+    ampModel: "UK ROCK", bank: "STD", ampReal: "Hiwatt DR103 (proche tweed 45W brit)",
     gain: 4, volume: 6, treble: 5, middle: 5, bass: 5, master: 6,
     pedal: "COMP", pedalOn: true, modType: "FLANGER", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: true, delayTime: 440, delayFb: 40, reverb: "HALL", reverbOn: true, reverbMix: 40,
@@ -640,7 +640,7 @@ const P = {
     tip: "💡 <strong>Gilmour jouait en Strat — comme toi !</strong> Micro <strong>manche</strong>, Tone à 6 (les Texas Special sont brillants). Délai à <strong>440ms</strong> synchronisé au tempo — utilise le bouton <strong>TAP</strong> de l'ampli. Ampli très clair, distorsion vient du Big Muff uniquement."
   },
   srv: { title: "Pride and Joy", artist: "Stevie Ray Vaughan", genre: "Blues",
-    ampModel: "UK BLUES", ampReal: "Fender Vibroverb / Dumble",
+    ampModel: "CALI CLEAN", bank: "CST", factoryPreset: true, ampReal: "Fender Blackface modifié (style Dumble)",
     gain: 5, volume: 8, treble: 6, middle: 7, bass: 6, master: 7,
     pedal: "TUBE OD", pedalOn: true, modType: "TWIN TREM", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: false, delayTime: 0, delayFb: 0, reverb: "SPRING", reverbOn: true, reverbMix: 25,
@@ -652,7 +652,7 @@ const P = {
     tip: "💡 <strong>SRV jouait en Strat Texas Special comme toi !</strong> C'est le son le plus approchable avec ta guitare. Ton médiator épais est parfait pour son picking agressif. VOLUME et MASTER élevés pour saturer l'ampli naturellement. Réverb SPRING légère."
   },
   muse: { title: "Supermassive Black Hole", artist: "Muse", genre: "Alt Rock",
-    ampModel: "US METAL", ampReal: "Diezel VH4 / Mesa Rectifier",
+    ampModel: "US METAL", bank: "STD", ampReal: "Mesa Dual Rectifier (Bellamy joue en Diezel)",
     gain: 8, volume: 6, treble: 6, middle: 5, bass: 6, master: 6,
     pedal: "FUZZ", pedalOn: true, modType: "FLANGER", modOn: true, modDepth: 80, modSpeed: 20,
     delayOn: false, delayTime: 0, delayFb: 0, reverb: "ROOM", reverbOn: true, reverbMix: 15,
@@ -664,7 +664,7 @@ const P = {
     tip: "💡 <strong>FUZZ</strong> dans Pedal pour la texture. <strong>FLANGER</strong> profond (G4 Rotary, Depth élevé) pour le groove robotique. Active NR SENS — les single coils bourdonnent à ce gain."
   },
   daftpunk: { title: "Get Lucky (solo)", artist: "Daft Punk / Nile Rodgers", genre: "Funk",
-    ampModel: "CLEAN", ampReal: "Fender Twin Reverb",
+    ampModel: "CALI CLEAN", bank: "STD", ampReal: "Fender Pro 6G5-A (clean chaud funk)",
     gain: 2, volume: 7, treble: 6, middle: 5, bass: 4, master: 6,
     pedal: "COMP", pedalOn: true, modType: "OFF", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: false, delayTime: 0, delayFb: 0, reverb: "ROOM", reverbOn: true, reverbMix: 20,
@@ -689,8 +689,9 @@ function renderGrid() {
     </div>`).join('');
   const presetHtml = Object.keys(P).map(k => {
     const p = P[k];
+    const star = p.factoryPreset ? '<span title="Programme d\'usine VT20+" style="color:var(--ok);margin-left:6px;">★</span>' : '';
     return `<div class="song-item" data-preset="${k}">
-      <div class="si-name">${p.title}</div>
+      <div class="si-name">${p.title}${star}</div>
       <div class="si-artist">${p.artist}</div>
       <span class="si-genre">${p.genre}</span>
     </div>`;
@@ -716,14 +717,19 @@ function render(d) {
 
   document.getElementById('dTitle').textContent = d.title;
   document.getElementById('dArtist').textContent = d.artist;
-  document.getElementById('dModel').innerHTML = `${escapeHtml(d.ampModel)}<br><span style="opacity:.55">${escapeHtml(d.ampReal)}</span>`;
+  const bankColors = { STD: '#4ade80', SPL: '#f0a830', CST: '#d63b3b' };
+  const bankNames = { STD: 'STANDARD', SPL: 'SPECIAL', CST: 'CUSTOM' };
+  const b = d.bank || 'STD';
+  const bankBadge = `<span style="display:inline-block;padding:1px 6px;border-radius:3px;background:${bankColors[b]}22;color:${bankColors[b]};border:1px solid ${bankColors[b]}55;font-size:.55rem;letter-spacing:1px;margin-left:6px;">● ${b}</span>`;
+  const factory = d.factoryPreset ? `<div style="font-size:.55rem;color:var(--ok);margin-top:4px;letter-spacing:.5px;">★ PROGRAMME D'USINE</div>` : '';
+  document.getElementById('dModel').innerHTML = `${escapeHtml(d.ampModel)}${bankBadge}<br><span style="opacity:.55">${escapeHtml(d.ampReal)}</span>${factory}`;
 
   const an = document.getElementById('adaptNote');
   if (d.guitarNote) { an.innerHTML = '🎸 ' + d.guitarNote; an.style.display = 'block'; }
   else an.style.display = 'none';
 
   const r1 = document.getElementById('row1');
-  let h = `<div class="sel-g"><div class="sel-lbl">Sélecteur (33 AMPS)</div><div class="sel-val">${escapeHtml(d.ampModel)}<br><span style="font-size:.56rem;opacity:.6">${escapeHtml(d.ampReal)}</span></div></div><div class="ksep"></div>`;
+  let h = `<div class="sel-g"><div class="sel-lbl">Sélecteur (33 AMPS) · Bouton AMP : ${bankNames[b]}</div><div class="sel-val" style="border-color:${bankColors[b]}88;color:${bankColors[b]};">${escapeHtml(d.ampModel)}<br><span style="font-size:.56rem;opacity:.6;color:var(--cream)">${escapeHtml(d.ampReal)}</span></div></div><div class="ksep"></div>`;
   ['gain', 'volume', 'treble', 'middle', 'bass', 'master'].forEach(k => {
     h += `<div class="knob-g">${kSvg(d[k], 62)}<div class="k-lbl">${k.toUpperCase()}</div><div class="k-val">${d[k]}</div></div>`;
   });
@@ -782,13 +788,30 @@ async function searchSong() {
   const btn = document.getElementById('goBtn'), loadEl = document.getElementById('loadEl'), errEl = document.getElementById('errEl');
   btn.disabled = true; loadEl.classList.add('on'); errEl.classList.remove('on');
 
-  const sys = `Tu es un expert en son de guitare et en amplificateur VOX VT40+.
+  const sys = `Tu es un expert en son de guitare et en amplificateur VOX VT20+ (combo 30W, HP 8", lampe 12AX7 Valve Reactor).
 ${GUITAR_CTX}
-Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans \`\`\`, sans texte avant ou après. Structure exacte (tous champs obligatoires) :
-{"title":"Nom","artist":"Artiste","genre":"Genre court","ampModel":"MODELE_VT40","ampReal":"vrai ampli original","gain":5,"volume":6,"treble":5,"middle":5,"bass":5,"master":6,"pedal":"TYPE_PEDAL","pedalOn":false,"modType":"TYPE_MOD","modOn":false,"modDepth":0,"modSpeed":0,"delayOn":false,"delayTime":300,"delayFb":30,"reverb":"ROOM","reverbOn":false,"reverbMix":20,"guitar":{"pickup":4,"tone":7,"volume":10,"note":"note courte réglages guitare Strat"},"guitarNote":"note courte adaptée Strat single-coil Texas Special","extPedals":[{"icon":"emoji","name":"nom pédale","desc":"description","params":[{"n":"NOM","v":5}],"opt":false}],"tip":"💡 <strong>Strat + médiator épais :</strong> conseil pratique"}
-Modèles VT40+ disponibles : DELUXE CL, SUPER CL, UK BLUES, UK VINTAGE, UK 70S, UK 80S, UK MODERN, US HIGAIN, US BLUES, US METAL, 8TO METAL, CALI CLEAN, CLEAN, VOX AC15, UK ROCK, UK METAL.
-Pedal : COMP, BRN OCTAVE, U-VIBE, ACOUSTIC, TREBLE BOOST, TUBE OD, GOLD DRIVE, ORG DIST, METAL DIST, FUZZ, OFF.
-G4 Rotary : TWIN TREM, ORG PHASE, FLANGER, MULTI CHORUS, CE CHORUS, PITCH SHIFT, FILTRON, TAPE ECHO, DELAY, CHORUS+DELAY, OFF.
+IMPORTANT : utilise UNIQUEMENT les modèles d'ampli réellement présents sur le VT20+. Chaque modèle a 3 banques (STD/SPL/CST) sélectionnables avec le bouton AMP (vert/orange/rouge).
+
+11 MODÈLES D'AMPLI (33 sons au total avec les banques) :
+1. CLEAN — STD: Dumble clean / SPL: Roland JC-120 / CST: 3-band clean linéaire
+2. CALI CLEAN — STD: Fender Pro 6G5-A / SPL: Fender Tweed Twin 1957 / CST: Blackface modifié
+3. US BLUES — STD: Fender Bassman 4x10 1959 / SPL: Bruno Cowtipper Pro II / CST: tête boutique 30W
+4. US 2x12 — STD: Fender Twin Blackface / SPL: Matchless DC30 / CST: actif crunch/distortion
+5. VOX AC15 — STD: AC15TB top boost / SPL: AC15 1962 1x12 / CST: Night Train Thick
+6. VOX AC30 — STD: AC30 top boost 1964 / SPL: AC30 Heritage Alnico Blue / CST: AC30BM Brian May
+7. UK ROCK — STD: Marshall JTM45 tweed / SPL: Marshall JCM800 100W / CST: Marshall Plexi 50W
+8. UK METAL — STD: Marshall JCM2000 100W / SPL: Diezel VH4 / CST: Marshall hand-wired (Slash style)
+9. US HIGH GAIN — STD: Soldano SLO-100 / SPL: Bogner Ecstasy snake / CST: power metal
+10. US METAL — STD: Mesa Dual Rectifier / SPL: Peavey 5150 / CST: Peavey 5150 brown sound (Van Halen)
+11. BOUTIQUE METAL — STD: Diezel Herbert / SPL: ENGL Powerball 4 canaux / CST: high gain moderne actif
+
+Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans \`\`\`, sans texte avant ou après. Structure exacte :
+{"title":"Nom","artist":"Artiste","genre":"Genre court","ampModel":"CLEAN|CALI CLEAN|US BLUES|US 2x12|VOX AC15|VOX AC30|UK ROCK|UK METAL|US HIGH GAIN|US METAL|BOUTIQUE METAL","bank":"STD|SPL|CST","ampReal":"vrai ampli original modélisé","gain":5,"volume":6,"treble":5,"middle":5,"bass":5,"master":6,"pedal":"OFF|COMP|ACOUSTIC|AUTO WAH|U-VIBE|BRN OCTAVE|TREBLE BOOST|TUBE OD|GOLD DRIVE|ORG DIST|METAL DIST|FUZZ","pedalOn":false,"pedalValue":5,"modType":"OFF|CE CHORUS|MULTI CHORUS|FLANGER|ORG PHASE|TWIN TREM|G4 ROTARY|PITCH SHIFT|FILTRON|TAPE ECHO|DELAY|CHORUS+DELAY","modOn":false,"modDepth":0,"modSpeed":0,"delayOn":false,"delayTime":300,"delayFb":30,"reverb":"OFF|ROOM|SPRING|HALL","reverbOn":false,"reverbMix":20,"guitar":{"pickup":4,"tone":7,"volume":10,"note":"note courte réglages guitare Strat"},"guitarNote":"note courte adaptée Strat single-coil Texas Special","extPedals":[{"icon":"emoji","name":"nom pédale","desc":"description","params":[{"n":"NOM","v":5}],"opt":false}],"tip":"💡 <strong>Strat + médiator épais :</strong> conseil pratique"}
+
+PEDAL effects (1 seul à la fois, knob VALUE règle paramètre principal) : COMP (SENS), ACOUSTIC (TONE), AUTO WAH (SENS), U-VIBE (SPEED), BRN OCTAVE (LEVEL), TREBLE BOOST (GAIN), TUBE OD (GAIN), GOLD DRIVE (GAIN), ORG DIST (GAIN), METAL DIST (GAIN), FUZZ (GAIN).
+MOD/DELAY effects (1 seul à la fois, knobs DEPTH + TAP/SPEED) : CE CHORUS, MULTI CHORUS, FLANGER, ORG PHASE, TWIN TREM, G4 ROTARY, PITCH SHIFT, FILTRON, TAPE ECHO (40-1048ms), DELAY (40-1048ms), CHORUS+DELAY.
+REVERB types : ROOM, SPRING, HALL.
+
 Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé", artist="Essaie un autre titre", valeurs neutres.`;
 
   try {
@@ -804,7 +827,7 @@ Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé",
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: sys },
-          { role: "user", content: "Réglages VOX VT40+ adaptés à une Fender American Special Strat (single-coil Texas Special, médiator épais) pour le morceau : " + q }
+          { role: "user", content: "Réglages VOX VT20+ adaptés à une Fender American Special Strat (single-coil Texas Special, médiator épais) pour le morceau : " + q }
         ]
       })
     });

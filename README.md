@@ -1,12 +1,12 @@
-# VOX VT40+ Tone Matcher
+# VOX VT20+ Tone Matcher
 
-Web app perso pour reproduire le son de mes morceaux préférés sur mon **VOX VT40+** avec ma **Fender American Special Stratocaster** (single-coils Texas Special, médiator épais).
+Web app perso pour reproduire le son de mes morceaux préférés sur mon **VOX VT20+** avec ma **Fender American Special Stratocaster** (single-coils Texas Special, médiator épais).
 
 Powered by **GPT-4o** (OpenAI API) — recherche n'importe quel morceau et obtiens les réglages d'ampli, le choix de micro, le tone/volume guitare, et les pédales recommandées.
 
 ## ✨ Features
 
-- 🎛️ Affichage fidèle de la façade VOX VT40+ avec potards SVG animés
+- 🎛️ Affichage fidèle de la façade VOX VT20+ avec potards SVG animés
 - 🎸 Réglages adaptés à une Strat single-coil Texas Special
 - 🤖 Recherche IA via GPT-4o — n'importe quel morceau
 - 💾 Stockage local des morceaux générés (jamais re-payés)
