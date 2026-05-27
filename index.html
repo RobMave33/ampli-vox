@@ -272,6 +272,52 @@ body::before{
 }
 .adapt-note strong{color:var(--accent);}
 
+/* PROCEDURE — step by step buttons */
+.procedure{
+  background:linear-gradient(180deg,#161922 0%,#101218 100%);
+  border:1px solid #2a3040;border-left:4px solid var(--ok);
+  border-radius:var(--r);padding:14px 16px;
+}
+.procedure.factory{border-left-color:var(--ok);}
+.procedure.manual{border-left-color:var(--accent);}
+.proc-title{
+  font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2.5px;color:var(--cream);
+  display:flex;align-items:center;gap:10px;margin-bottom:12px;
+}
+.proc-badge{
+  font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:1.2px;
+  padding:3px 8px;border-radius:4px;
+}
+.proc-badge.factory{background:rgba(74,222,128,.15);color:var(--ok);border:1px solid rgba(74,222,128,.4);}
+.proc-badge.manual{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-line);}
+.proc-steps{display:flex;flex-direction:column;gap:9px;}
+.proc-step{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:10px 12px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:var(--r-sm);
+}
+.proc-num{
+  width:26px;height:26px;flex-shrink:0;border-radius:50%;
+  background:var(--accent);color:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:.95rem;
+}
+.proc-body{flex:1;font-size:.82rem;line-height:1.55;color:var(--text);}
+.proc-body strong{color:var(--cream);}
+.proc-body .btn-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--panel-2);border:1px solid var(--border);
+  padding:2px 8px;border-radius:4px;
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  color:var(--cream);margin:0 2px;
+}
+.proc-body .led{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.proc-body .led.green{background:#4ade80;box-shadow:0 0 6px #4ade80;}
+.proc-body .led.orange{background:#f0a830;box-shadow:0 0 6px #f0a830;}
+.proc-body .led.red{background:#d63b3b;box-shadow:0 0 6px #d63b3b;}
+.proc-hint{
+  font-size:.7rem;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;
+}
+
 /* AMP FACE */
 .amp-wrap{
   background:var(--grad-amp);
@@ -461,6 +507,7 @@ body::before{
       <div class="song-by" id="dArtist">—</div>
     </div>
     <div class="adapt-note" id="adaptNote"></div>
+    <div class="procedure" id="procedure"></div>
     <div class="amp-wrap">
       <div class="amp-brand-bar">
         <div class="amp-brand">VOX<span>VT20+</span></div>
@@ -719,7 +766,51 @@ function render(d) {
   document.getElementById('dArtist').textContent = d.artist;
   const bankColors = { STD: '#4ade80', SPL: '#f0a830', CST: '#d63b3b' };
   const bankNames = { STD: 'STANDARD', SPL: 'SPECIAL', CST: 'CUSTOM' };
+  const bankLed = { STD: 'green', SPL: 'orange', CST: 'red' };
   const b = d.bank || 'STD';
+
+  // PROCEDURE
+  const proc = document.getElementById('procedure');
+  if (d.factoryPreset) {
+    proc.className = 'procedure factory';
+    proc.innerHTML = `
+      <div class="proc-title">Comment l'activer <span class="proc-badge factory">★ PROGRAMME D'USINE</span></div>
+      <div class="proc-steps">
+        <div class="proc-step"><div class="proc-num">1</div><div class="proc-body">
+          Appuie sur <span class="btn-tag">PRESET</span> jusqu'à ce que le voyant soit <strong style="color:#d63b3b">ROUGE</strong> <span class="led red"></span>
+          <div class="proc-hint">Mode SONG · reproduit le son d'un morceau célèbre</div>
+        </div></div>
+        <div class="proc-step"><div class="proc-num">2</div><div class="proc-body">
+          Appuie sur <span class="btn-tag">AMP</span> jusqu'à ce que le voyant soit <strong style="color:${bankColors[b]}">${bankNames[b]}</strong> <span class="led ${bankLed[b]}"></span>
+          <div class="proc-hint">Banque ${b} (${bankNames[b]})</div>
+        </div></div>
+        <div class="proc-step"><div class="proc-num">3</div><div class="proc-body">
+          Tourne le sélecteur <span class="btn-tag">33 AMPS</span> sur <strong style="color:${bankColors[b]}">${escapeHtml(d.ampModel)}</strong>
+          <div class="proc-hint">C'est fait. Le son est chargé automatiquement.</div>
+        </div></div>
+      </div>`;
+  } else {
+    proc.className = 'procedure manual';
+    proc.innerHTML = `
+      <div class="proc-title">Comment l'activer <span class="proc-badge manual">⚙ RÉGLAGE MANUEL</span></div>
+      <div class="proc-steps">
+        <div class="proc-step"><div class="proc-num">1</div><div class="proc-body">
+          <strong>Maintiens</strong> <span class="btn-tag">PRESET</span> pendant 1 seconde jusqu'à ce que le voyant <strong>MANUAL</strong> s'allume
+          <div class="proc-hint">Mode Manual · la position physique des potards détermine le son</div>
+        </div></div>
+        <div class="proc-step"><div class="proc-num">2</div><div class="proc-body">
+          Appuie sur <span class="btn-tag">AMP</span> jusqu'à ce que le voyant soit <strong style="color:${bankColors[b]}">${bankNames[b]}</strong> <span class="led ${bankLed[b]}"></span>, puis tourne le sélecteur <span class="btn-tag">33 AMPS</span> sur <strong style="color:${bankColors[b]}">${escapeHtml(d.ampModel)}</strong>
+        </div></div>
+        <div class="proc-step"><div class="proc-num">3</div><div class="proc-body">
+          Règle les potards <strong>GAIN, VOLUME, TREBLE, MIDDLE, BASS, MASTER</strong> exactement comme indiqué sur la façade ci-dessous
+          <div class="proc-hint">Chaque chiffre correspond à la position du potard (0 à 10)</div>
+        </div></div>
+        <div class="proc-step"><div class="proc-num">4</div><div class="proc-body">
+          Règle les effets <strong>PEDAL, MOD/DELAY, REVERB</strong> comme indiqué dans la section EFFETS
+          <div class="proc-hint">Pour activer un effet, tourne le potard hors de la position OFF</div>
+        </div></div>
+      </div>`;
+  }
   const bankBadge = `<span style="display:inline-block;padding:1px 6px;border-radius:3px;background:${bankColors[b]}22;color:${bankColors[b]};border:1px solid ${bankColors[b]}55;font-size:.55rem;letter-spacing:1px;margin-left:6px;">● ${b}</span>`;
   const factory = d.factoryPreset ? `<div style="font-size:.55rem;color:var(--ok);margin-top:4px;letter-spacing:.5px;">★ PROGRAMME D'USINE</div>` : '';
   document.getElementById('dModel').innerHTML = `${escapeHtml(d.ampModel)}${bankBadge}<br><span style="opacity:.55">${escapeHtml(d.ampReal)}</span>${factory}`;
