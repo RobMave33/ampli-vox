@@ -401,17 +401,17 @@ body::before{
     <div class="api-tagline">Tone Matcher · Strat Edition</div>
   </div>
   <div class="api-card">
-    <div class="api-heading"><span class="dot"></span>Clé API Anthropic</div>
+    <div class="api-heading"><span class="dot"></span>Clé API OpenAI</div>
     <div class="api-desc">
-      L'app utilise <strong>Claude</strong> (Anthropic) pour analyser n'importe quel morceau et te donner les réglages VOX VT40+ adaptés à ta Strat.<br><br>
-      Ta clé reste <strong>uniquement sur cet appareil</strong> (localStorage). Elle n'est jamais envoyée ailleurs qu'à l'API Anthropic.<br><br>
-      Obtiens ta clé sur <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com → API Keys</a>.
+      L'app utilise <strong>GPT-4o</strong> (OpenAI) pour analyser n'importe quel morceau et te donner les réglages VOX VT40+ adaptés à ta Strat.<br><br>
+      Ta clé reste <strong>uniquement sur cet appareil</strong> (localStorage). Elle n'est jamais envoyée ailleurs qu'à l'API OpenAI.<br><br>
+      Obtiens ta clé sur <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com → API Keys</a>.
     </div>
     <div>
-      <div class="field-lbl">Ta clé Anthropic</div>
-      <input class="api-inp" id="apiKeyInp" type="password" placeholder="sk-ant-..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <div class="field-lbl">Ta clé OpenAI</div>
+      <input class="api-inp" id="apiKeyInp" type="password" placeholder="sk-..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
     </div>
-    <div class="api-err" id="apiErr">Clé invalide — elle doit commencer par <strong>sk-ant-</strong></div>
+    <div class="api-err" id="apiErr">Clé invalide — elle doit commencer par <strong>sk-</strong></div>
     <button class="api-save" onclick="saveKey()">ENREGISTRER ET CONTINUER</button>
     <button class="api-skip" onclick="skipKey()">Continuer sans clé · presets uniquement</button>
     <div class="api-note">🔒 Stockée localement · Jamais partagée avec un tiers</div>
@@ -423,7 +423,7 @@ body::before{
   <span style="font-size:.95rem">🎸</span>
   <span class="guitar-tag">FENDER AM. SPECIAL STRAT · TEXAS SPECIAL · MÉDIATOR ÉPAIS</span>
   <div class="key-indicator" id="keyDot"></div>
-  <button class="key-btn" onclick="changeKey()">Clé API</button>
+  <button class="key-btn" onclick="changeKey()">Clé OpenAI</button>
 </div>
 
 <!-- ══ TAB BAR ══ -->
@@ -437,12 +437,12 @@ body::before{
 
 <!-- PAGE MORCEAUX -->
 <div class="page active" id="page-search">
-  <div class="sec-lbl">Recherche Claude — n'importe quel morceau</div>
+  <div class="sec-lbl">Recherche GPT-4o — n'importe quel morceau</div>
   <div class="search-row">
     <input class="search-inp" id="aiInp" placeholder="Ex: Sultans of Swing, Texas Flood, Money for Nothing…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
     <button class="go-btn" id="goBtn" onclick="searchSong()">GO</button>
   </div>
-  <div class="loading" id="loadEl"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>Claude analyse le son…</span></div>
+  <div class="loading" id="loadEl"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-4o analyse le son…</span></div>
   <div class="err-msg" id="errEl"></div>
 
   <div class="sec-lbl">Morceaux préréglés</div>
@@ -492,7 +492,7 @@ body::before{
 const GUITAR_CTX = "La guitare du joueur est une Fender American Special Stratocaster avec micros single-coil Texas Special et médiator épais/rigide. Points clés : micros single-coil brillants et précis, attaque définie avec médiator épais, son naturellement clair avec beaucoup de présence dans les hauts médiums. Avec fort gain les single-coils captent des parasites — recommande un noise gate si besoin. Adapte le TREBLE (baisser vs humbucker), précise le choix de micro (position 1=manche, 2=inter manche, 3=milieu, 4=inter chevalet, 5=chevalet), et le réglage Tone/Volume de la guitare.";
 
 /* ── STORAGE ──────────────────────────────────────── */
-const KEY_LS = 'vox_anthropic_key';
+const KEY_LS = 'vox_openai_key';
 const CUSTOM_LS = 'vox_custom_songs';
 const getKey = () => { try { return localStorage.getItem(KEY_LS) || ''; } catch { return ''; } };
 const setKeyLS = k => { try { localStorage.setItem(KEY_LS, k); } catch {} };
@@ -502,7 +502,7 @@ const saveCustom = arr => { try { localStorage.setItem(CUSTOM_LS, JSON.stringify
 function saveKey() {
   const k = document.getElementById('apiKeyInp').value.trim();
   const err = document.getElementById('apiErr');
-  if (k && !k.startsWith('sk-ant-')) { err.classList.add('on'); return; }
+  if (k && !k.startsWith('sk-')) { err.classList.add('on'); return; }
   err.classList.remove('on');
   if (k) setKeyLS(k);
   bootApp();
@@ -523,12 +523,12 @@ function bootApp() {
   const hasKey = !!getKey();
   const dot = document.getElementById('keyDot');
   dot.className = 'key-indicator ' + (hasKey ? 'on' : 'off');
-  dot.title = hasKey ? 'Clé Anthropic active' : 'Sans clé (préréglés seulement)';
+  dot.title = hasKey ? 'Clé OpenAI active' : 'Sans clé (préréglés seulement)';
   document.getElementById('aiInp').disabled = !hasKey;
   document.getElementById('goBtn').disabled = !hasKey;
   document.getElementById('aiInp').placeholder = hasKey
     ? 'Ex: Sultans of Swing, Texas Flood, Wonderwall…'
-    : 'Clé Anthropic requise pour la recherche';
+    : 'Clé OpenAI requise pour la recherche';
   renderGrid();
 }
 window.addEventListener('load', () => { if (getKey()) bootApp(); });
@@ -685,7 +685,7 @@ function renderGrid() {
     <div class="song-item" data-custom="${i}">
       <div class="si-name">${escapeHtml(p.title)}</div>
       <div class="si-artist">${escapeHtml(p.artist)}</div>
-      <span class="si-genre ai">CLAUDE · ${escapeHtml(p.ampModel || 'AI')}</span>
+      <span class="si-genre ai">GPT · ${escapeHtml(p.ampModel || 'AI')}</span>
     </div>`).join('');
   const presetHtml = Object.keys(P).map(k => {
     const p = P[k];
@@ -773,12 +773,12 @@ function switchTab(id, btn) {
   document.getElementById('page-' + id).classList.add('active');
 }
 
-/* ── ANTHROPIC SEARCH ─────────────────────────────── */
+/* ── OPENAI SEARCH ────────────────────────────────── */
 async function searchSong() {
   const inp = document.getElementById('aiInp'), q = inp.value.trim();
   if (!q) return;
   const k = getKey();
-  if (!k) { showErr('Clé Anthropic manquante.'); return; }
+  if (!k) { showErr('Clé OpenAI manquante.'); return; }
   const btn = document.getElementById('goBtn'), loadEl = document.getElementById('loadEl'), errEl = document.getElementById('errEl');
   btn.disabled = true; loadEl.classList.add('on'); errEl.classList.remove('on');
 
@@ -792,27 +792,25 @@ G4 Rotary : TWIN TREM, ORG PHASE, FLANGER, MULTI CHORUS, CE CHORUS, PITCH SHIFT,
 Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé", artist="Essaie un autre titre", valeurs neutres.`;
 
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": k,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true"
+        "Authorization": "Bearer " + k
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 2000,
+        model: "gpt-4o",
         temperature: 0.3,
-        system: sys,
+        response_format: { type: "json_object" },
         messages: [
+          { role: "system", content: sys },
           { role: "user", content: "Réglages VOX VT40+ adaptés à une Fender American Special Strat (single-coil Texas Special, médiator épais) pour le morceau : " + q }
         ]
       })
     });
     const data = await res.json();
-    if (data.type === 'error' || data.error) throw new Error((data.error && data.error.message) || data.message || 'Erreur API');
-    const raw = (data.content && data.content[0] && data.content[0].text) || '';
+    if (data.error) throw new Error(data.error.message);
+    const raw = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
     const cleaned = raw.replace(/```json|```/g, '').trim();
     const preset = JSON.parse(cleaned);
 
@@ -825,7 +823,7 @@ Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé",
     inp.value = '';
     toast('✓ Morceau ajouté');
   } catch (e) {
-    showErr("Erreur : " + (e.message || "vérifie ta clé Anthropic."));
+    showErr("Erreur : " + (e.message || "vérifie ta clé OpenAI."));
   }
   btn.disabled = false; loadEl.classList.remove('on');
 }

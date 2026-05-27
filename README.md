@@ -2,13 +2,13 @@
 
 Web app perso pour reproduire le son de mes morceaux préférés sur mon **VOX VT40+** avec ma **Fender American Special Stratocaster** (single-coils Texas Special, médiator épais).
 
-Powered by **Claude** (Anthropic API) — recherche n'importe quel morceau et obtiens les réglages d'ampli, le choix de micro, le tone/volume guitare, et les pédales recommandées.
+Powered by **GPT-4o** (OpenAI API) — recherche n'importe quel morceau et obtiens les réglages d'ampli, le choix de micro, le tone/volume guitare, et les pédales recommandées.
 
 ## ✨ Features
 
 - 🎛️ Affichage fidèle de la façade VOX VT40+ avec potards SVG animés
 - 🎸 Réglages adaptés à une Strat single-coil Texas Special
-- 🤖 Recherche IA via Claude Sonnet 4.6 — n'importe quel morceau
+- 🤖 Recherche IA via GPT-4o — n'importe quel morceau
 - 💾 Stockage local des morceaux générés (jamais re-payés)
 - 📱 Optimisé tablette / iPad / mobile / desktop
 - 🔒 Clé API stockée uniquement en localStorage
@@ -25,9 +25,9 @@ Ouvre simplement `index.html` dans ton navigateur. C'est tout.
 
 ## 🔑 Clé API
 
-Obtiens ta clé sur [console.anthropic.com](https://console.anthropic.com/settings/keys) (commence par `sk-ant-...`).
+Obtiens ta clé sur [platform.openai.com](https://platform.openai.com/api-keys) (commence par `sk-...`).
 
-Elle reste **uniquement** sur ton appareil (localStorage navigateur). L'app appelle directement l'API Anthropic depuis le navigateur via le header `anthropic-dangerous-direct-browser-access` — donc ne déploie pas cette URL publiquement avec ta clé pré-remplie.
+Elle reste **uniquement** sur ton appareil (localStorage navigateur). L'app appelle directement l'API OpenAI depuis le navigateur — donc ne déploie pas cette URL publiquement avec ta clé pré-remplie.
 
 ## 🎸 Profil guitare
 
@@ -41,5 +41,5 @@ Pour adapter à une autre guitare, modifie la constante `GUITAR_CTX` dans `index
 ## 📦 Stack
 
 - HTML/CSS/JS vanilla — zéro build, zéro dépendance
-- Anthropic Messages API (claude-sonnet-4-6)
+- OpenAI Chat Completions API (gpt-4o)
 - Polices : Bebas Neue, JetBrains Mono, Inter (Google Fonts)
