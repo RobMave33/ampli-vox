@@ -551,21 +551,54 @@ body::before{
 
 /* POWER LEVEL */
 .vt-power-row{
-  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-  padding:10px 14px;margin-top:8px;
+  display:flex;flex-direction:column;gap:12px;
+  padding:12px 14px;margin-top:8px;
   background:rgba(0,0,0,.28);border:1px solid #2a2510;border-radius:8px;
 }
-.vt-power-lbl{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--accent);letter-spacing:2.5px;flex-shrink:0;}
+.vt-power-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.vt-power-head-l{display:flex;flex-direction:column;gap:3px;}
+.vt-power-lbl{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;color:var(--accent);letter-spacing:2.5px;}
+.vt-power-hint-mini{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.3px;}
+.vt-power-readout{display:flex;align-items:center;gap:10px;}
 .vt-power-knob{flex-shrink:0;line-height:0;}
-.vt-power-readout{display:flex;flex-direction:column;align-items:flex-start;gap:2px;flex-shrink:0;}
-.vt-power-watts{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--cream);letter-spacing:1px;line-height:1;}
-.vt-power-watts span{font-size:.85rem;color:var(--accent);margin-left:2px;}
+.vt-power-readout-txt{display:flex;flex-direction:column;align-items:flex-start;gap:3px;}
+.vt-power-watts{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:var(--cream);letter-spacing:1px;line-height:1;}
+.vt-power-watts span{font-size:.85rem;color:var(--accent);margin-left:3px;}
 .vt-power-ctx-tag{
   font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:1.5px;
   color:var(--accent);padding:2px 7px;border-radius:3px;
   background:var(--accent-soft);border:1px solid var(--accent-line);
 }
-.vt-power-hint{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.3px;flex:1;min-width:160px;line-height:1.5;}
+
+.vt-power-modes{display:flex;gap:7px;flex-wrap:wrap;}
+.vt-power-mode{
+  flex:1;min-width:78px;
+  background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:6px;
+  padding:8px 6px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;font-family:'JetBrains Mono',monospace;
+  transition:all .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.vt-power-mode:hover{border-color:var(--accent-line);background:rgba(240,168,48,.06);}
+.vt-power-mode:active{transform:scale(.97);}
+.vt-power-mode.on{
+  background:var(--accent-soft);border-color:var(--accent);
+  box-shadow:0 0 14px rgba(240,168,48,.22),inset 0 0 0 1px rgba(240,168,48,.3);
+}
+.vt-power-mode .m-icon{font-size:1rem;line-height:1;margin-bottom:1px;filter:grayscale(.4);opacity:.85;}
+.vt-power-mode.on .m-icon{filter:none;opacity:1;}
+.vt-power-mode .m-lbl{font-size:.58rem;color:var(--muted);letter-spacing:1.5px;}
+.vt-power-mode.on .m-lbl{color:var(--accent);}
+.vt-power-mode .m-w{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--cream);letter-spacing:1px;line-height:1;}
+.vt-power-mode.on .m-w{color:var(--accent);}
+
+.vt-power-note{
+  font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#b5b6ba;line-height:1.55;
+  padding:8px 10px;border-radius:5px;
+  background:rgba(240,168,48,.06);border:1px solid var(--accent-line);
+}
+.vt-power-note strong{color:var(--accent);}
 
 /* ── MOBILE RESPONSIVE — VT20+ panel stacks instead of horizontal scroll ── */
 @media (max-width:760px){
@@ -804,6 +837,23 @@ const PEDAL_TYPES = ['OFF','COMP','ACOUSTIC','AUTO WAH','U-VIBE','BRN OCTAVE','T
 const MOD_TYPES = ['OFF','CE CHORUS','MULTI CHORUS','FLANGER','ORG PHASE','TWIN TREM','G4 ROTARY','PITCH SHIFT','FILTRON','TAPE ECHO','DELAY','CHORUS+DELAY'];
 const REVERB_TYPES = ['OFF','ROOM','SPRING','HALL'];
 
+/* ── PLAY MODE (POWER LEVEL contexts) ─────────────── */
+const POWER_MODES = [
+  { id: 'appart',  lbl: 'APPART',  w: 3,  sub: '1–5 W',  icon: '🏠' },
+  { id: 'chambre', lbl: 'CHAMBRE', w: 8,  sub: '5–12 W', icon: '🛋️' },
+  { id: 'repet',   lbl: 'RÉPÈT',   w: 15, sub: '12–22 W', icon: '🥁' },
+  { id: 'concert', lbl: 'CONCERT', w: 25, sub: '22–30 W', icon: '🎤' }
+];
+const MODE_LS = 'vox_play_mode';
+const getPlayMode = () => { try { return localStorage.getItem(MODE_LS) || 'appart'; } catch { return 'appart'; } };
+const setPlayModeLS = id => { try { localStorage.setItem(MODE_LS, id); } catch {} };
+let currentDisplay = null;
+function changePlayMode(id) {
+  setPlayModeLS(id);
+  toast(`Mode : ${POWER_MODES.find(m=>m.id===id).lbl} — règle ton POWER LEVEL sur ${POWER_MODES.find(m=>m.id===id).w} W`);
+  if (currentDisplay) render(currentDisplay);
+}
+
 /* ── CHICKENHEAD KNOB (cream, for EQ) ─────────────── */
 function chickenKnobSvg(v, sz) {
   sz = sz || 64; v = Math.max(0, Math.min(10, v));
@@ -988,19 +1038,40 @@ function buildPanel(d) {
 
     <!-- POWER LEVEL row -->
     ${(() => {
-      const pw = typeof d.powerLevel === 'number' ? Math.max(1, Math.min(30, d.powerLevel)) : 3;
-      const ctx = pw <= 5 ? 'APPART' : pw <= 12 ? 'CHAMBRE' : pw <= 22 ? 'RÉPÈT' : 'CONCERT';
-      // map 1-30 W onto 0-10 knob value for visual
-      const knobV = Math.round(((pw - 1) / 29) * 10);
+      const modeId = getPlayMode();
+      const mode = POWER_MODES.find(m => m.id === modeId) || POWER_MODES[0];
+      const songPwr = typeof d.powerLevel === 'number' ? d.powerLevel : null;
+      let songNote = '';
+      if (songPwr && songPwr > mode.w + 4) {
+        const suggestedMode = POWER_MODES.slice().reverse().find(m => m.w <= songPwr + 3) || POWER_MODES[1];
+        songNote = `<div class="vt-power-note">💡 Ce morceau profite d'un POWER LEVEL ≥ <strong>${songPwr} W</strong> (compression du power amp). Bascule en <strong>${suggestedMode.lbl}</strong> si tu peux.</div>`;
+      }
+      const knobV = Math.round(((mode.w - 1) / 29) * 10);
       return `
       <div class="vt-power-row">
-        <div class="vt-power-lbl">POWER LEVEL</div>
-        <div class="vt-power-knob">${chickenKnobSvg(knobV, 54)}</div>
-        <div class="vt-power-readout">
-          <div class="vt-power-watts">${pw} <span>W</span></div>
-          <div class="vt-power-ctx-tag">${ctx}</div>
+        <div class="vt-power-head">
+          <div class="vt-power-head-l">
+            <div class="vt-power-lbl">POWER LEVEL</div>
+            <div class="vt-power-hint-mini">Clique ton mode → règle le potard physique sur ${mode.w} W</div>
+          </div>
+          <div class="vt-power-readout">
+            <div class="vt-power-knob">${chickenKnobSvg(knobV, 50)}</div>
+            <div class="vt-power-readout-txt">
+              <div class="vt-power-watts">${mode.w}<span>W</span></div>
+              <div class="vt-power-ctx-tag">${mode.lbl}</div>
+            </div>
+          </div>
         </div>
-        <div class="vt-power-hint">Atténuateur de l'étage de puissance — change uniquement le volume final, pas le timbre. Tu peux pousser GAIN/VOLUME sans déranger les voisins.</div>
+        <div class="vt-power-modes">
+          ${POWER_MODES.map(m => `
+            <button class="vt-power-mode${m.id===modeId?' on':''}" type="button" onclick="changePlayMode('${m.id}')" title="${m.sub}">
+              <span class="m-icon">${m.icon}</span>
+              <span class="m-lbl">${m.lbl}</span>
+              <span class="m-w">${m.w} W</span>
+            </button>
+          `).join('')}
+        </div>
+        ${songNote}
       </div>`;
     })()}
 
@@ -1248,6 +1319,7 @@ const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&
 
 /* ── RENDER ───────────────────────────────────────── */
 function render(d) {
+  currentDisplay = d;
   document.getElementById('ph').style.display = 'none';
   const ad = document.getElementById('ad');
   ad.style.display = 'flex';
