@@ -852,7 +852,14 @@ function selectorSvg(labels, activeIdx, sz, opts) {
     const col = active ? accent : '#6a5c30';
     dots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${active?2.6:1.7}" fill="${col}"${active?` style="filter:drop-shadow(0 0 4px ${accent})"`:''}/>`;
     const fs = Math.max(6.5, sz*0.045);
-    texts += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="${fs}" font-weight="${active?'700':'400'}" fill="${active?accent:'#8a7848'}">${escapeHtml(labels[i])}</text>`;
+    // Split multi-word labels (and "CHORUS+DELAY") onto 2 lines for cleaner radial layout
+    const parts = String(labels[i]).split(/[\s+]+/).filter(Boolean);
+    const lineH = fs * 1.05;
+    const startY = ty - (parts.length - 1) * lineH / 2;
+    const tspans = parts.map((p, j) =>
+      `<tspan x="${tx.toFixed(1)}" y="${(startY + j*lineH).toFixed(1)}">${escapeHtml(p)}</tspan>`
+    ).join('');
+    texts += `<text text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="${fs}" font-weight="${active?'700':'400'}" fill="${active?accent:'#8a7848'}">${tspans}</text>`;
   }
 
   const ka = (knobAng - 90) * Math.PI/180;
@@ -867,7 +874,7 @@ function selectorSvg(labels, activeIdx, sz, opts) {
     : `<radialGradient id="${id}" cx="35%" cy="28%"><stop offset="0%" stop-color="#52473a"/><stop offset="100%" stop-color="#1c1a15"/></radialGradient>`;
   const pointerCol = cream ? '#2a1808' : '#ddc878';
 
-  return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">
+  return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" overflow="visible" style="overflow:visible" xmlns="http://www.w3.org/2000/svg">
     <defs>${fillKnob}</defs>
     ${dots}
     ${texts}
