@@ -1,89 +1,52 @@
-# Handoff — VOX VT20+ Tone Matcher (Strat Edition)
+# Handoff — Ampli VOX VT20+ Tone Matcher
 
 _Dernière mise à jour : 2026-05-28_
 
 ## 01 — Objectifs / Mission
 
-App web statique (HTML+JS+CSS dans un seul `index.html`) qui aide le joueur à régler son **VOX VT20+** pour reproduire n'importe quel morceau, **adapté à sa Fender American Special Strat (single-coils Texas Special, médiator épais)**.
-
-- Recherche de morceaux libres via **GPT-5.5** (OpenAI API, clé fournie par l'utilisateur, stockée localement)
-- Bibliothèque de morceaux préréglés (Nirvana, AC/DC, Hendrix, Metallica, Pink Floyd, SRV, Muse, Daft Punk, Johnny B. Goode BTTF)
-- Façade VT20+ "fidèle" rendue en SVG : sélecteurs rotatifs (33 AMPS / PEDAL / MOD-DELAY / REVERB), potards EQ chicken-head, LEDs, POWER LEVEL cliquable (4 modes)
-- Sauvegarde locale des morceaux GPT (jusqu'à 500), export/import JSON
-- **Nouveau cette session** : bouton "✏️ Ajuster ce preset" → modale feedback + URL YouTube → GPT-5.5 régénère le preset corrigé
-- Déployé en GitHub Pages : https://robmave33.github.io/ampli-vox/
-- Repo : https://github.com/RobMave33/ampli-vox
-
-But de la session écoulée :
-1. Affiner le preset Johnny B. Goode (BTTF) après comparaison audio user vs vidéo YouTube de référence
-2. Ajouter un mécanisme de **correction de preset à partir d'un feedback texte** (intégrer une diagnose externe, type analyse GPT thinking comparant un enregistrement et une vidéo)
-3. Basculer le modèle GPT-5 → **GPT-5.5**
+- App web mono-fichier (`index.html`) qui génère les réglages VOX VT20+ adaptés à une Fender American Special Strat (Texas Special, médiator épais) pour n'importe quel morceau, via GPT-5.5.
+- Stocke clé OpenAI + bibliothèque de presets en localStorage. Inclut presets factory, Adjust feedback-driven, modes POWER LEVEL (appart/chambre/répèt/concert).
+- **Session du 2026-05-28** : audit sécurité + bugs (`/code-review` medium effort, 3 angles parallèles), puis correction de tous les findings — XSS, validation, état après delete, et bug pédale signalé par l'utilisateur (pedalValue affiché ≠ 0 alors que pedalOn=false sur un preset GPT).
 
 ## 02 — État actuel du code
 
-**Ce qui marche :**
-- Tout l'existant pré-session (recherche, biblio, façade SVG, POWER LEVEL 4 modes, scrollbar, favicon)
-- **Preset Johnny B. Goode révisé** (commit `f4f1a1f`) : TREBLE 7→8, MID 6→5, BASS 4→3 ; ajout TAPE ECHO 100ms feedback 15% (slapback signature 50s) ; micro chevalet (5) au lieu d'inter-chevalet ; tones guitare 8→9 ; `guitarNote` et `tip` mis à jour. Validé à l'oreille par l'utilisateur après croisement avec analyse externe (GPT thinking + .m4a perso + vidéo YouTube Marty McFly).
-- **Feature "Ajuster ce preset"** (commit `abdef31`) :
-  - Bouton sous le `tipBox` ouvre une modale (overlay sombre + carte centrée)
-  - Champs : textarea feedback + input URL YouTube (optionnel)
-  - Appel GPT-5.5 avec prompt système d'ajustement dédié (court, focalisé sur "modifier UNIQUEMENT ce qui sert le feedback") + le preset actuel sérialisé en JSON
-  - **Persistance** : preset custom → mis à jour en place (même index dans `getCustom()`) ; preset d'usine → cloné en haut de la biblio avec " (ajusté)" suffixé au titre + champs `adjustedFromKey` / `adjustedAt`
-  - State `currentSource = {type:'factory'|'custom', key?, index?}` posé dans les click handlers de `renderGrid()` et après `searchSong()`
-- **Modèle bumped à `gpt-5.5`** (commit `68acda6`) pour les 2 appels API (`searchSong` + `submitAdjust`) + labels UI ("GPT-5.5 analyse le son…", etc.)
+**Ce qui marche**
+- Toutes les corrections appliquées (voir section 03).
+- Bug pédale OFF/valeur≠0 corrigé : `pedalValue` et `depthVal` forcés à 0 quand l'effet est OFF.
+- XSS bloqué sur les 4 sinks (`d.tip`, `d.guitarNote`, `g.note`, `extPedals[].*`) via helper `safeHtml` (allow-list `<strong>` + `<br>`).
+- `validatePreset()` clamp/nettoie tout JSON entrant (réponse GPT, import).
+- État DOM cohérent après delete d'un custom : `currentSource.index` shifté ou reset, écran ampli revient au placeholder si le preset supprimé était affiché.
+- `saveCustom` retourne bool et toast une erreur si quota localStorage ou troncature à 500.
 
-**Ce qui ne marche pas / à surveiller :**
-- _Rien de cassé connu_, mais à valider en condition réelle :
-  - **Disponibilité de `gpt-5.5` sur la clé OpenAI de l'utilisateur** : si erreur "model not found" en prod, fallback `gpt-5` ou snapshot `gpt-5.5-2026-04-23`
-  - **Coût GPT-5.5** : pas vérifié dans la doc, peut être ~2-3× plus cher que GPT-5. L'utilisateur a choisi de garder 5.5 partout et de surveiller via `platform.openai.com/usage`. Stratégie hybride possible si trop cher : `gpt-5.4-mini` pour la recherche, `gpt-5.5` pour l'ajustement uniquement.
-  - **UX modale ajustement** : pas testée en condition réelle, la mise en page mobile pourrait avoir besoin de retouches (overlay 6vh top, max-width 540px)
+**Ce qui ne marche pas / à vérifier**
+- Tests manuels pas encore effectués par l'utilisateur après les patchs (preview ouverte). Golden paths à tester :
+  1. Import d'un JSON malicieux → doit être rejeté
+  2. Recherche GPT d'un nouveau morceau → vérifier que le knob VALUE de PEDAL est à 0 quand pedalOn=false
+  3. Suppression du preset actuellement affiché → l'écran ampli doit revenir au placeholder
+  4. Ajuster un preset après avoir supprimé un autre custom de la liste → doit modifier le bon preset
+- Modèle API `gpt-5.5` ([index.html:1629](index.html:1629), [1731](index.html:1731)) — pas vérifié si ce nom existe vraiment côté OpenAI ; si non, toutes les requêtes échouent.
+- Pas de simplification effectuée — l'utilisateur a dit « non laisse comme c'est ». Code ajoute ~80 lignes (helpers de sécurité).
 
 ## 03 — Fichiers touchés
 
-- `index.html` — fichier unique de l'app (HTML + CSS + JS). Toutes les modifs de la session sont dedans :
-  - **EQ + slapback Johnny B. Goode** : objet `johnnybgoode` dans la const `P` (~ligne 1223)
-  - **CSS modale + bouton ajuster** : après `.err-msg.on` (~ligne 270)
-  - **HTML modale + bouton** : après `<div class="tip" id="tipBox">` (~ligne 798)
-  - **JS adjust** : `openAdjust()`, `closeAdjust()`, `submitAdjust()` ajoutées en fin de bloc `<script>` (~ligne 1645+)
-  - **State `currentSource`** : déclaré ligne 883, mis à jour dans les click handlers `renderGrid()` (~ligne 1285) et après `searchSong()` (~ligne 1582)
-  - **Modèle `gpt-5.5`** : lignes ~1629 et ~1731 dans les 2 `fetch`
-- `handoff.md` — ce fichier, à la racine (untracked, jamais committé jusqu'ici)
-
-Pas de framework, pas de build : édition directe + git push → GitHub Pages rebuild en ~30s.
+- `index.html` — modifié (uncommitted). Ajouts/modifs :
+  - Helpers `safeHtml`, `validatePreset`, `_clamp` (après [index.html:1419](index.html:1419))
+  - `escapeHtml` durci (gère `null/undefined`)
+  - `buildPanel` : `pedalValue` et `depthVal` à 0 si OFF
+  - `render()` : `d.guitar` avec fallback ; tous les innerHTML AI passent par `safeHtml`/`escapeHtml`
+  - `importLib` : valide chaque entrée via `validatePreset`, compte les rejetées
+  - `searchSong` / `submitAdjust` : valident le JSON GPT, throw clean error si invalide
+  - `saveCustom` : retourne bool, toast quota/troncature
+  - Delete handler + `clearLib` : reset/shift `currentSource`/`currentDisplay`
+  - `changePlayMode` : defensive find()
 
 ## 04 — Tentatives échouées
 
-- **Refactor du prompt système en const partagée `SYS_PROMPT`** au début de la session : tentative de hack avec `void \`...\`` puis `/* commentaire */` qui a créé du bruit dans le code. Abandonné — finalement chaque appel API garde son propre prompt inline (search = prompt long avec exemples few-shot ; adjust = prompt court focalisé sur la diff). **Ne PAS rejouer cette refacto**, ça ne sert à rien tant qu'il n'y a que 2 appels.
-- **Idée d'intégrer audio direct (.m4a + extraction YouTube) dans l'app** : envisagée puis écartée. GPT-5 / GPT-5.5 standard ne prennent pas d'audio en entrée — il faudrait `gpt-4o-audio-preview` + MediaRecorder + extraction YouTube côté client (lourd). Choix retenu : passer par du **texte de feedback** (l'utilisateur fait l'analyse audio externalement via GPT thinking et colle la diagnose).
-- **GPT-5 + `temperature: 0.4`** (déjà connu de la session précédente, conservé ici en mémoire) → API renvoie `Unsupported value`. GPT-5/5.5 n'acceptent QUE la valeur par défaut. **Ne pas remettre le param temperature dans le body.**
-- **`commit -a` sans identité git** → bloqué. Toujours commit via `git -c user.email="robin.maveyraud@gmail.com" -c user.name="Robin Maveyraud" commit -m "…"` (consigne user : ne pas toucher au config global).
+_Rien à signaler_ — toutes les corrections demandées ont été appliquées sans piste morte.
 
 ## 05 — Prochaines étapes
 
-**À faire au démarrage si le user le demande :**
-
-1. **Validation en condition réelle de la feature "Ajuster ce preset"** :
-   - Sélectionner un preset, cliquer "✏️ Ajuster ce preset", coller un feedback (ex : copier l'analyse GPT thinking comme on a fait pour Johnny B. Goode), valider.
-   - Vérifier que :
-     - Si preset d'usine → un nouveau morceau "(ajusté)" apparaît en haut de la biblio
-     - Si preset custom → il est mis à jour à la même place (titre conservé)
-     - Le `tip` et `guitarNote` sont bien mis à jour par GPT, pas juste les valeurs numériques
-   - Si bug visuel sur mobile, retoucher `.adj-modal { max-width:540px }` et `.adj-overlay { padding:6vh 14px }` (~ligne 270 du CSS).
-
-2. **Vérifier dispo de `gpt-5.5` sur la clé** : si l'API renvoie une erreur "model not found", soit :
-   - Fallback `gpt-5` (rapide, on rollback les 2 occurrences ligne ~1629 et ~1731)
-   - Tester snapshot daté `gpt-5.5-2026-04-23`
-   - Ou stratégie hybride : `gpt-5.4-mini` dans `searchSong` + `gpt-5.5` dans `submitAdjust`
-
-3. **Idées en attente, non implémentées** :
-   - Bouton "Reset" sur un preset d'usine ajusté pour revenir à l'original (utile si l'ajustement rate)
-   - Badge visuel "AJUSTÉ" sur les morceaux clonés depuis un preset d'usine (utiliser `adjustedFromKey`)
-   - Audio direct via `gpt-4o-audio-preview` (gros chantier, écarté pour l'instant)
-
-4. **Ne PAS toucher :**
-   - L'orientation des potards (startA=225)
-   - Les wattages POWER LEVEL (3/8/15/25)
-   - Le composant guitare 2 TONE (manche + milieu)
-   - Le preset Johnny B. Goode actuel — validé à l'oreille par l'utilisateur
-
-**Démarrage type :** utilisateur parle français, mode direct/familier, préfère qu'on lui dise ce qui ne marchera pas avant de coder. Toujours commit + push à la fin d'une série de modifs, identité inline `git -c user.email=… -c user.name=…`. Site live = https://robmave33.github.io/ampli-vox/.
+1. **Test manuel** des 4 golden paths listés en section 02 (l'utilisateur n'a pas encore validé après les patchs).
+2. **Vérifier le nom du modèle OpenAI** `gpt-5.5` à [index.html:1629](index.html:1629) et [index.html:1731](index.html:1731) — si l'API renvoie « model not found », tester `gpt-4o`, `gpt-5`, ou le dernier disponible.
+3. **Commit** des changements actuels : `git add index.html && git commit -m "Fix XSS sinks, add preset validation, fix pedal OFF/value bug"`.
+4. **Si l'utilisateur revient sur la simplification** : 3 opportunités déjà identifiées dans la conversation — `bankColors`/`bankLed`/`bankNames` dupliqués entre [index.html:1041](index.html:1041) et [index.html:1431](index.html:1431) ; sélecteurs DOM répétés à cacher ; helper `showAppUI(visible)` pour mutualiser `bootApp`/`changeKey`.

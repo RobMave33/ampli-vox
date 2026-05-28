@@ -856,7 +856,17 @@ const CUSTOM_LS = 'vox_custom_songs';
 const getKey = () => { try { return localStorage.getItem(KEY_LS) || ''; } catch { return ''; } };
 const setKeyLS = k => { try { localStorage.setItem(KEY_LS, k); } catch {} };
 const getCustom = () => { try { return JSON.parse(localStorage.getItem(CUSTOM_LS) || '[]'); } catch { return []; } };
-const saveCustom = arr => { try { localStorage.setItem(CUSTOM_LS, JSON.stringify(arr.slice(0, 500))); } catch {} };
+const saveCustom = arr => {
+  const trimmed = arr.slice(0, 500);
+  try {
+    localStorage.setItem(CUSTOM_LS, JSON.stringify(trimmed));
+    if (arr.length > 500) toast(`⚠ Bibliothèque pleine (500 max) — ${arr.length - 500} ancien${arr.length-500>1?'s':''} retiré${arr.length-500>1?'s':''}`);
+    return true;
+  } catch (e) {
+    toast('✗ Sauvegarde impossible — quota localStorage atteint');
+    return false;
+  }
+};
 
 function saveKey() {
   const k = document.getElementById('apiKeyInp').value.trim();
@@ -945,8 +955,10 @@ const setPlayModeLS = id => { try { localStorage.setItem(MODE_LS, id); } catch {
 let currentDisplay = null;
 let currentSource = null; /* {type:'factory'|'custom', key?:string, index?:number} */
 function changePlayMode(id) {
+  const mode = POWER_MODES.find(m => m.id === id);
+  if (!mode) return;
   setPlayModeLS(id);
-  toast(`Mode : ${POWER_MODES.find(m=>m.id===id).lbl} — règle ton POWER LEVEL sur ${POWER_MODES.find(m=>m.id===id).w} W`);
+  toast(`Mode : ${mode.lbl} — règle ton POWER LEVEL sur ${mode.w} W`);
   if (currentDisplay) {
     const page = document.getElementById('page-amp');
     const savedScroll = page ? page.scrollTop : 0;
@@ -1047,8 +1059,8 @@ function buildPanel(d) {
   const reverbIdx = REVERB_TYPES.indexOf(d.reverbOn ? d.reverb : 'OFF');
   const presetLedOn = !!d.factoryPreset;
   const manualLedOn = !d.factoryPreset;
-  const pedalValue = typeof d.pedalValue === 'number' ? d.pedalValue : (d.pedalOn ? 5 : 0);
-  const depthVal = Math.round((d.modDepth || 0) / 10);
+  const pedalValue = d.pedalOn ? (typeof d.pedalValue === 'number' ? d.pedalValue : 5) : 0;
+  const depthVal = (d.modOn || d.delayOn) ? Math.round((d.modDepth || 0) / 10) : 0;
   const tapLedOn = d.delayOn || (d.modOn && d.modSpeed > 0);
 
   const eqRow = ['gain','volume','treble','middle','bass','master'].map(k =>
@@ -1359,7 +1371,23 @@ function renderGrid() {
       if (!confirm(`Supprimer "${name}" de ta bibliothèque ?`)) return;
       arr.splice(i, 1);
       saveCustom(arr);
+      if (currentSource && currentSource.type === 'custom') {
+        if (currentSource.index === i) {
+          currentSource = null; currentDisplay = null;
+          document.getElementById('ad').style.display = 'none';
+          document.getElementById('ph').style.display = 'flex';
+        } else if (currentSource.index > i) {
+          currentSource.index--;
+        }
+      }
       renderGrid();
+      if (currentSource && currentSource.type === 'custom') {
+        const el = document.querySelector(`.song-item[data-custom="${currentSource.index}"]`);
+        if (el) el.classList.add('active');
+      } else if (currentSource && currentSource.type === 'factory') {
+        const el = document.querySelector(`.song-item[data-preset="${currentSource.key}"]`);
+        if (el) el.classList.add('active');
+      }
       toast('✓ Supprimé');
     });
   });
@@ -1387,16 +1415,19 @@ function importLib(ev) {
       const incoming = JSON.parse(e.target.result);
       if (!Array.isArray(incoming)) throw new Error('Format invalide');
       const existing = getCustom();
-      const seen = new Set(existing.map(p => (p.title + '|' + p.artist).toLowerCase()));
-      let added = 0;
-      for (const p of incoming) {
-        if (!p || !p.title || !p.ampModel) continue;
-        const k = (p.title + '|' + p.artist).toLowerCase();
+      const norm = (p) => ((p.title || '').trim() + '|' + (p.artist || '').trim()).toLowerCase();
+      const seen = new Set(existing.map(norm));
+      let added = 0, rejected = 0;
+      for (const raw of incoming) {
+        const p = validatePreset(raw);
+        if (!p) { rejected++; continue; }
+        const k = norm(p);
         if (seen.has(k)) continue;
         seen.add(k);
         existing.push(p);
         added++;
       }
+      if (rejected) toast(`⚠ ${rejected} entrée${rejected>1?'s':''} ignorée${rejected>1?'s':''} (format invalide)`);
       saveCustom(existing);
       renderGrid();
       toast(added ? `✓ ${added} morceau${added>1?'x':''} importé${added>1?'s':''}` : 'Aucun nouveau morceau');
@@ -1413,10 +1444,80 @@ function clearLib() {
   if (!arr.length) return;
   if (!confirm(`Vider ta bibliothèque (${arr.length} morceau${arr.length>1?'x':''}) ? Cette action est irréversible — pense à exporter avant.`)) return;
   saveCustom([]);
+  if (currentSource && currentSource.type === 'custom') {
+    currentSource = null; currentDisplay = null;
+    document.getElementById('ad').style.display = 'none';
+    document.getElementById('ph').style.display = 'flex';
+  }
   renderGrid();
   toast('Bibliothèque vidée');
 }
-const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+// HTML allow-list for AI/imported text fields. Escapes everything, then re-enables only <strong> and <br>.
+const safeHtml = s => {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;')
+    .replace(/&lt;(\/?(?:strong|br))\s*&gt;/gi, '<$1>');
+};
+const _clamp = (v, lo, hi, dflt) => { const n = Number(v); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, Math.round(n))) : dflt; };
+function validatePreset(p) {
+  if (!p || typeof p !== 'object') return null;
+  if (typeof p.title !== 'string' || !p.title.trim()) return null;
+  if (!AMP_MODELS.includes(p.ampModel)) return null;
+  p.title = p.title.trim();
+  p.artist = typeof p.artist === 'string' ? p.artist : '';
+  p.genre = typeof p.genre === 'string' ? p.genre : '';
+  p.ampReal = typeof p.ampReal === 'string' ? p.ampReal : '';
+  p.bank = ['STD','SPL','CST'].includes(p.bank) ? p.bank : 'STD';
+  p.gain = _clamp(p.gain, 0, 10, 5);
+  p.volume = _clamp(p.volume, 0, 10, 5);
+  p.treble = _clamp(p.treble, 0, 10, 5);
+  p.middle = _clamp(p.middle, 0, 10, 5);
+  p.bass = _clamp(p.bass, 0, 10, 5);
+  p.master = _clamp(p.master, 0, 10, 5);
+  p.pedal = PEDAL_TYPES.includes(p.pedal) ? p.pedal : 'OFF';
+  p.modType = MOD_TYPES.includes(p.modType) ? p.modType : 'OFF';
+  p.reverb = REVERB_TYPES.includes(p.reverb) ? p.reverb : 'OFF';
+  p.pedalOn = !!p.pedalOn;
+  p.modOn = !!p.modOn;
+  p.delayOn = !!p.delayOn;
+  p.reverbOn = !!p.reverbOn;
+  p.factoryPreset = !!p.factoryPreset;
+  p.pedalValue = _clamp(p.pedalValue, 0, 100, 5);
+  p.modDepth = _clamp(p.modDepth, 0, 100, 0);
+  p.modSpeed = _clamp(p.modSpeed, 0, 100, 0);
+  p.delayTime = _clamp(p.delayTime, 40, 1048, 300);
+  p.delayFb = _clamp(p.delayFb, 0, 100, 30);
+  p.reverbMix = _clamp(p.reverbMix, 0, 100, 20);
+  p.powerLevel = _clamp(p.powerLevel, 1, 30, 3);
+  p.tip = typeof p.tip === 'string' ? p.tip : '';
+  p.guitarNote = typeof p.guitarNote === 'string' ? p.guitarNote : '';
+  const g = (p.guitar && typeof p.guitar === 'object') ? p.guitar : {};
+  g.pickup = _clamp(g.pickup, 1, 5, 3);
+  g.tone = _clamp(g.tone, 0, 10, 7);
+  g.volume = _clamp(g.volume, 0, 10, 10);
+  if (g.tone2 != null) g.tone2 = _clamp(g.tone2, 0, 10, g.tone);
+  g.note = typeof g.note === 'string' ? g.note : '';
+  p.guitar = g;
+  p.extPedals = Array.isArray(p.extPedals) ? p.extPedals
+    .filter(x => x && typeof x === 'object' && typeof x.name === 'string')
+    .map(x => ({
+      icon: typeof x.icon === 'string' ? x.icon : '🎛️',
+      name: x.name,
+      desc: typeof x.desc === 'string' ? x.desc : '',
+      opt: !!x.opt,
+      params: Array.isArray(x.params) ? x.params
+        .filter(pp => pp && typeof pp.n === 'string')
+        .map(pp => ({
+          n: pp.n,
+          v: typeof pp.v === 'number' ? pp.v : null,
+          ...(typeof pp.label === 'string' ? { label: pp.label } : {})
+        })) : []
+    })) : [];
+  return p;
+}
 
 /* ── RENDER ───────────────────────────────────────── */
 function render(d, opts) {
@@ -1480,12 +1581,12 @@ function render(d, opts) {
   document.getElementById('dModel').innerHTML = `${escapeHtml(d.ampModel)}${bankBadge}<br><span style="opacity:.55">${escapeHtml(d.ampReal)}</span>${factory}`;
 
   const an = document.getElementById('adaptNote');
-  if (d.guitarNote) { an.innerHTML = '🎸 ' + d.guitarNote; an.style.display = 'block'; }
+  if (d.guitarNote) { an.innerHTML = '🎸 ' + safeHtml(d.guitarNote); an.style.display = 'block'; }
   else an.style.display = 'none';
 
   document.getElementById('vtPanel').innerHTML = buildPanel(d);
 
-  const g = d.guitar;
+  const g = d.guitar || { pickup: 3, tone: 5, volume: 10, note: '' };
   const gc = document.getElementById('guitarControls');
   let ghtml = `<div class="pickup-group"><div class="pickup-lbl">Position micro</div><div class="pickup-switch">${pickupHtml(g.pickup)}</div></div>`;
   const tone2 = (typeof g.tone2 === 'number') ? g.tone2 : g.tone;
@@ -1494,19 +1595,19 @@ function render(d, opts) {
     <div class="gknob-g">${kSvg(g.tone, 54)}<div class="gk-lbl">TONE 1<br><span style="font-size:.45rem;opacity:.7">MANCHE</span></div><div class="gk-val">${g.tone}</div></div>
     <div class="gknob-g">${kSvg(tone2, 54)}<div class="gk-lbl">TONE 2<br><span style="font-size:.45rem;opacity:.7">MILIEU</span></div><div class="gk-val">${tone2}</div></div>
   </div>`;
-  ghtml += `<div class="guitar-note-txt">${g.note}</div>`;
+  ghtml += `<div class="guitar-note-txt">${safeHtml(g.note)}</div>`;
   gc.innerHTML = ghtml;
 
   const ps = document.getElementById('pedSec'), pl = document.getElementById('pedList');
   if (d.extPedals && d.extPedals.length) {
     pl.innerHTML = d.extPedals.map(p => {
-      const pph = p.params.map(pp => `<div class="pp"><div class="pp-lbl">${pp.n}</div>${pp.label ? `<div class="pp-val" style="font-size:.7rem">${pp.label}</div>` : kSvg(pp.v, 42) + `<div class="pp-val">${pp.v}</div>`}</div>`).join('');
-      return `<div class="pedal-card"><div class="pedal-icon">${p.icon}</div><div class="pedal-info"><div class="pedal-name">${escapeHtml(p.name)}</div><div class="pedal-desc">${escapeHtml(p.desc)}</div><div class="pedal-params">${pph}</div>${p.opt ? '<span class="opt-badge">OPTIONNEL</span>' : ''}</div></div>`;
+      const pph = (p.params || []).map(pp => `<div class="pp"><div class="pp-lbl">${escapeHtml(pp.n)}</div>${pp.label ? `<div class="pp-val" style="font-size:.7rem">${escapeHtml(pp.label)}</div>` : kSvg(pp.v, 42) + `<div class="pp-val">${escapeHtml(pp.v)}</div>`}</div>`).join('');
+      return `<div class="pedal-card"><div class="pedal-icon">${escapeHtml(p.icon)}</div><div class="pedal-info"><div class="pedal-name">${escapeHtml(p.name)}</div><div class="pedal-desc">${escapeHtml(p.desc)}</div><div class="pedal-params">${pph}</div>${p.opt ? '<span class="opt-badge">OPTIONNEL</span>' : ''}</div></div>`;
     }).join('');
     ps.style.display = 'block';
   } else { pl.innerHTML = ''; ps.style.display = 'none'; }
 
-  document.getElementById('tipBox').innerHTML = d.tip;
+  document.getElementById('tipBox').innerHTML = safeHtml(d.tip);
 
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('ampTab').classList.add('active');
@@ -1638,13 +1739,16 @@ Réponds ensuite UNIQUEMENT avec le JSON final.`;
     if (data.error) throw new Error(data.error.message);
     const raw = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
     const cleaned = raw.replace(/```json|```/g, '').trim();
-    const preset = JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
+    const preset = validatePreset(parsed);
+    if (!preset) throw new Error('Réponse GPT invalide (modèle d\'ampli ou titre manquant)');
 
     const custom = getCustom();
     custom.unshift(preset);
-    saveCustom(custom);
+    if (!saveCustom(custom)) throw new Error('Sauvegarde impossible');
     renderGrid();
-    document.querySelector('.song-item[data-custom="0"]').classList.add('active');
+    const newEl = document.querySelector('.song-item[data-custom="0"]');
+    if (newEl) newEl.classList.add('active');
     currentSource = { type:'custom', index:0 };
     render(preset);
     inp.value = '';
@@ -1740,14 +1844,16 @@ Renvoie le preset ajusté en JSON complet.`;
     if (data.error) throw new Error(data.error.message);
     const raw = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
     const cleaned = raw.replace(/```json|```/g, '').trim();
-    const adjusted = JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
+    const adjusted = validatePreset(parsed);
+    if (!adjusted) throw new Error('Réponse GPT invalide (modèle d\'ampli ou titre manquant)');
     adjusted.adjustedFromKey = currentSource.type === 'factory' ? currentSource.key : (currentDisplay.adjustedFromKey || null);
     adjusted.adjustedAt = new Date().toISOString();
 
     const arr = getCustom();
-    if (currentSource.type === 'custom' && typeof currentSource.index === 'number') {
+    if (currentSource.type === 'custom' && typeof currentSource.index === 'number' && arr[currentSource.index]) {
       arr[currentSource.index] = adjusted;
-      saveCustom(arr);
+      if (!saveCustom(arr)) throw new Error('Sauvegarde impossible');
       renderGrid();
       const el = document.querySelector(`.song-item[data-custom="${currentSource.index}"]`);
       if (el) el.classList.add('active');
@@ -1756,7 +1862,7 @@ Renvoie le preset ajusté en JSON complet.`;
     } else {
       if (!adjusted.title.toLowerCase().includes('ajusté')) adjusted.title = adjusted.title + ' (ajusté)';
       arr.unshift(adjusted);
-      saveCustom(arr);
+      if (!saveCustom(arr)) throw new Error('Sauvegarde impossible');
       renderGrid();
       currentSource = { type:'custom', index:0 };
       const el = document.querySelector('.song-item[data-custom="0"]');
