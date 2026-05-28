@@ -552,26 +552,20 @@ body::before{
 /* POWER LEVEL */
 .vt-power-row{
   display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-  padding:10px 12px;margin-top:8px;
-  background:rgba(0,0,0,.25);border:1px solid #2a2510;border-radius:8px;
+  padding:10px 14px;margin-top:8px;
+  background:rgba(0,0,0,.28);border:1px solid #2a2510;border-radius:8px;
 }
 .vt-power-lbl{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--accent);letter-spacing:2.5px;flex-shrink:0;}
-.vt-power-opts{display:flex;gap:6px;}
-.vt-power-opt{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:5px 11px;border-radius:5px;border:1px solid var(--border);
-  background:rgba(0,0,0,.25);min-width:54px;line-height:1.15;
-  transition:all .2s;
+.vt-power-knob{flex-shrink:0;line-height:0;}
+.vt-power-readout{display:flex;flex-direction:column;align-items:flex-start;gap:2px;flex-shrink:0;}
+.vt-power-watts{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--cream);letter-spacing:1px;line-height:1;}
+.vt-power-watts span{font-size:.85rem;color:var(--accent);margin-left:2px;}
+.vt-power-ctx-tag{
+  font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:1.5px;
+  color:var(--accent);padding:2px 7px;border-radius:3px;
+  background:var(--accent-soft);border:1px solid var(--accent-line);
 }
-.vt-power-opt.on{
-  background:var(--accent-soft);border-color:var(--accent);
-  box-shadow:0 0 10px rgba(240,168,48,.25);
-}
-.vt-power-val{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--cream);letter-spacing:1px;}
-.vt-power-opt.on .vt-power-val{color:var(--accent);}
-.vt-power-ctx{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-.vt-power-opt.on .vt-power-ctx{color:var(--accent);}
-.vt-power-hint{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.3px;flex:1;min-width:140px;line-height:1.4;}
+.vt-power-hint{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.3px;flex:1;min-width:160px;line-height:1.5;}
 
 /* ── MOBILE RESPONSIVE — VT20+ panel stacks instead of horizontal scroll ── */
 @media (max-width:760px){
@@ -986,17 +980,22 @@ function buildPanel(d) {
     </div>
 
     <!-- POWER LEVEL row -->
-    <div class="vt-power-row">
-      <div class="vt-power-lbl">POWER LEVEL</div>
-      <div class="vt-power-opts">
-        ${[1,20,30].map(w => {
-          const ctx = w===1 ? 'appart' : w===20 ? 'répèt' : 'concert';
-          const active = (d.powerLevel || 1) === w;
-          return `<div class="vt-power-opt${active?' on':''}"><span class="vt-power-val">${w}W</span><span class="vt-power-ctx">${ctx}</span></div>`;
-        }).join('')}
-      </div>
-      <div class="vt-power-hint">Même son aux 3 niveaux — change juste le volume final.</div>
-    </div>
+    ${(() => {
+      const pw = typeof d.powerLevel === 'number' ? Math.max(1, Math.min(30, d.powerLevel)) : 3;
+      const ctx = pw <= 5 ? 'APPART' : pw <= 12 ? 'CHAMBRE' : pw <= 22 ? 'RÉPÈT' : 'CONCERT';
+      // map 1-30 W onto 0-10 knob value for visual
+      const knobV = Math.round(((pw - 1) / 29) * 10);
+      return `
+      <div class="vt-power-row">
+        <div class="vt-power-lbl">POWER LEVEL</div>
+        <div class="vt-power-knob">${chickenKnobSvg(knobV, 54)}</div>
+        <div class="vt-power-readout">
+          <div class="vt-power-watts">${pw} <span>W</span></div>
+          <div class="vt-power-ctx-tag">${ctx}</div>
+        </div>
+        <div class="vt-power-hint">Atténuateur de l'étage de puissance — change uniquement le volume final, pas le timbre. Tu peux pousser GAIN/VOLUME sans déranger les voisins.</div>
+      </div>`;
+    })()}
 
     <!-- FOOT: brand + jacks -->
     <div class="vt-foot">
@@ -1355,11 +1354,11 @@ async function searchSong() {
 ${GUITAR_CTX}
 
 ═══ CONTEXTE D'UTILISATION (obligatoire à respecter) ═══
-Le joueur utilise son VT20+ EN APPARTEMENT en priorité, mais doit pouvoir transposer ses réglages à volume répèt/concert SANS changer le caractère du son. Conclusion pratique :
-• Le VT20+ a un POWER LEVEL physique (sélecteur 1W / 20W / 30W) qui est un ATTÉNUATEUR de l'étage de puissance — il change uniquement le volume sortant, PAS le timbre. Pour appart → 1W. Pour répèt → 20W. Pour scène → 30W.
-• Conséquence : tu peux pousser GAIN/VOLUME/MASTER pour faire saturer le préamp ET l'étage de puissance, et le joueur restera audible chez lui en POWER LEVEL 1W. Ne sous-dimensionne PAS le crunch par peur du volume.
-• Renvoie un champ "powerLevel" valant 1, 20 ou 30 selon le contexte d'usage typique du son (par défaut 1 pour appart).
-• Le joueur joue toujours HP physique (jamais casque). Donc tiens compte de la saturation du HP 8" sur les basses.
+Le joueur utilise son VT20+ EN APPARTEMENT en priorité (~3W), mais doit pouvoir transposer ses réglages à volume répèt/concert SANS changer le caractère du son. Conclusion pratique :
+• Le VT20+ a un POWER LEVEL physique (POTARD CONTINU MIN → 30W) qui est un ATTÉNUATEUR de l'étage de puissance — il change uniquement le volume sortant, PAS le timbre. Repères : 1-5W = appart, 5-12W = chambre / volume conversationnel, 12-22W = répèt, 22-30W = concert.
+• Conséquence : tu peux pousser GAIN/VOLUME/MASTER pour faire saturer le préamp ET l'étage de puissance, et le joueur restera audible chez lui en POWER LEVEL bas. Ne sous-dimensionne PAS le crunch par peur du volume.
+• Renvoie un champ "powerLevel" entier ∈ [1, 30] = wattage recommandé. Par défaut 3 (appart). Monte uniquement si la chanson NÉCESSITE absolument une compression de power amp qui ne vient qu'à fort wattage (cas rare).
+• Le joueur joue toujours HP physique (jamais casque). Tiens compte de la saturation du HP 8" sur les basses.
 
 ═══ CHAÎNE SIGNAL VT20+ (à comprendre pour bien placer les effets) ═══
 GUITARE → PEDAL (pré-ampli, interagit avec le gain stage : une OD ici POUSSE l'ampli, un FUZZ change le caractère du gain) → AMP MODEL (préamp + power amp simulés) → MOD/DELAY (post-ampli, temporel, n'affecte PAS la saturation) → REVERB (parallèle, en sortie) → HP 8".
@@ -1387,12 +1386,12 @@ La Strat à single-coils Texas Special est physiquement différente des guitares
 ═══ EXEMPLES (few-shot, pour calibrer ton raisonnement) ═══
 
 EXEMPLE 1 — entrée : "Back in Black, AC/DC"
-Raisonnement (NE PAS METTRE DANS LA RÉPONSE) : Angus Young joue une SG (humbucker) dans un Marshall Plexi/JTM45 dimed. Crunch = ampli poussé, pas pédale. Pour Strat compenser : MIDDLE haut, position 4 ou 5, NR SENS modéré. POWER LEVEL 1W pour appart.
-Sortie correcte : ampModel="UK ROCK", bank="CST" (Plexi 50W), gain≈6, volume≈9, treble≈7, middle≈7, bass≈5, master≈6, pedal="OFF" ou "TREBLE BOOST" VALUE 3, modOn=false, reverb="SPRING" mix 15-20, pickup=5, tones=8, volume guitare=10, powerLevel=1.
+Raisonnement (NE PAS METTRE DANS LA RÉPONSE) : Angus Young joue une SG (humbucker) dans un Marshall Plexi/JTM45 dimed. Crunch = ampli poussé, pas pédale. Pour Strat compenser : MIDDLE haut, position 4 ou 5, NR SENS modéré. POWER LEVEL ~3W pour appart.
+Sortie correcte : ampModel="UK ROCK", bank="CST" (Plexi 50W), gain≈6, volume≈9, treble≈7, middle≈7, bass≈5, master≈6, pedal="OFF" ou "TREBLE BOOST" VALUE 3, modOn=false, reverb="SPRING" mix 15-20, pickup=5, tones=8, volume guitare=10, powerLevel=3.
 
 EXEMPLE 2 — entrée : "Enter Sandman, Metallica"
-Raisonnement : Hetfield joue une ESP (humbucker actif) dans Mesa Boogie Mark IIC+/Dual Rectifier. High-gain MODERNE → préamp propre + OD push. Pour Strat → NS-2 obligatoire, MIDDLE bas (scooped), TREBLE haut (compense la perte single-coil sur disto). POWER LEVEL 1W appart ok.
-Sortie correcte : ampModel="US METAL", bank="STD" (Dual Recto), gain≈8, volume≈5, treble≈7, middle≈3, bass≈6, master≈6, pedal="TUBE OD" pedalOn=true VALUE 7 (pour tightener et booster), modOn=false, reverb="ROOM" mix 10, pickup=5, tones=10, volume guitare=10, NR SENS recommandé à 6, NS-2 dans extPedals, powerLevel=1.
+Raisonnement : Hetfield joue une ESP (humbucker actif) dans Mesa Boogie Mark IIC+/Dual Rectifier. High-gain MODERNE → préamp propre + OD push. Pour Strat → NS-2 obligatoire, MIDDLE bas (scooped), TREBLE haut (compense la perte single-coil sur disto). POWER LEVEL ~3W appart ok.
+Sortie correcte : ampModel="US METAL", bank="STD" (Dual Recto), gain≈8, volume≈5, treble≈7, middle≈3, bass≈6, master≈6, pedal="TUBE OD" pedalOn=true VALUE 7 (pour tightener et booster), modOn=false, reverb="ROOM" mix 10, pickup=5, tones=10, volume guitare=10, NR SENS recommandé à 6, NS-2 dans extPedals, powerLevel=3.
 
 ═══ FIN DES EXEMPLES ═══
 
@@ -1412,7 +1411,7 @@ IMPORTANT : utilise UNIQUEMENT les modèles d'ampli réellement présents sur le
 11. BOUTIQUE METAL — STD: Diezel Herbert / SPL: ENGL Powerball 4 canaux / CST: high gain moderne actif
 
 Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans \`\`\`, sans texte avant ou après. Structure exacte :
-{"title":"Nom","artist":"Artiste","genre":"Genre court","ampModel":"CLEAN|CALI CLEAN|US BLUES|US 2x12|VOX AC15|VOX AC30|UK ROCK|UK METAL|US HIGH GAIN|US METAL|BOUTIQUE METAL","bank":"STD|SPL|CST","ampReal":"vrai ampli original modélisé","gain":5,"volume":6,"treble":5,"middle":5,"bass":5,"master":6,"pedal":"OFF|COMP|ACOUSTIC|AUTO WAH|U-VIBE|BRN OCTAVE|TREBLE BOOST|TUBE OD|GOLD DRIVE|ORG DIST|METAL DIST|FUZZ","pedalOn":false,"pedalValue":5,"modType":"OFF|CE CHORUS|MULTI CHORUS|FLANGER|ORG PHASE|TWIN TREM|G4 ROTARY|PITCH SHIFT|FILTRON|TAPE ECHO|DELAY|CHORUS+DELAY","modOn":false,"modDepth":0,"modSpeed":0,"delayOn":false,"delayTime":300,"delayFb":30,"reverb":"OFF|ROOM|SPRING|HALL","reverbOn":false,"reverbMix":20,"powerLevel":1,"guitar":{"pickup":4,"tone":7,"tone2":7,"volume":10,"note":"note courte réglages guitare Strat — tone=micro manche, tone2=micro milieu (chevalet n'a pas de tone sur Strat)"},"guitarNote":"note courte adaptée Strat single-coil Texas Special","extPedals":[{"icon":"emoji","name":"nom pédale","desc":"description","params":[{"n":"NOM","v":5}],"opt":false}],"tip":"💡 <strong>Strat + médiator épais :</strong> conseil pratique"}
+{"title":"Nom","artist":"Artiste","genre":"Genre court","ampModel":"CLEAN|CALI CLEAN|US BLUES|US 2x12|VOX AC15|VOX AC30|UK ROCK|UK METAL|US HIGH GAIN|US METAL|BOUTIQUE METAL","bank":"STD|SPL|CST","ampReal":"vrai ampli original modélisé","gain":5,"volume":6,"treble":5,"middle":5,"bass":5,"master":6,"pedal":"OFF|COMP|ACOUSTIC|AUTO WAH|U-VIBE|BRN OCTAVE|TREBLE BOOST|TUBE OD|GOLD DRIVE|ORG DIST|METAL DIST|FUZZ","pedalOn":false,"pedalValue":5,"modType":"OFF|CE CHORUS|MULTI CHORUS|FLANGER|ORG PHASE|TWIN TREM|G4 ROTARY|PITCH SHIFT|FILTRON|TAPE ECHO|DELAY|CHORUS+DELAY","modOn":false,"modDepth":0,"modSpeed":0,"delayOn":false,"delayTime":300,"delayFb":30,"reverb":"OFF|ROOM|SPRING|HALL","reverbOn":false,"reverbMix":20,"powerLevel":3,"guitar":{"pickup":4,"tone":7,"tone2":7,"volume":10,"note":"note courte réglages guitare Strat — tone=micro manche, tone2=micro milieu (chevalet n'a pas de tone sur Strat)"},"guitarNote":"note courte adaptée Strat single-coil Texas Special","extPedals":[{"icon":"emoji","name":"nom pédale","desc":"description","params":[{"n":"NOM","v":5}],"opt":false}],"tip":"💡 <strong>Strat + médiator épais :</strong> conseil pratique"}
 
 PEDAL effects (1 seul à la fois, knob VALUE règle paramètre principal) : COMP (SENS), ACOUSTIC (TONE), AUTO WAH (SENS), U-VIBE (SPEED), BRN OCTAVE (LEVEL), TREBLE BOOST (GAIN), TUBE OD (GAIN), GOLD DRIVE (GAIN), ORG DIST (GAIN), METAL DIST (GAIN), FUZZ (GAIN).
 MOD/DELAY effects (1 seul à la fois, knobs DEPTH + TAP/SPEED) : CE CHORUS, MULTI CHORUS, FLANGER, ORG PHASE, TWIN TREM, G4 ROTARY, PITCH SHIFT, FILTRON, TAPE ECHO (40-1048ms), DELAY (40-1048ms), CHORUS+DELAY.
@@ -1426,14 +1425,14 @@ VALIDATION DES PLAGES NUMÉRIQUES (impératif) :
 • delayTime ∈ [40, 1048] (ms)
 • delayFb ∈ [0, 100]
 • pickup ∈ {1, 2, 3, 4, 5}, tone, tone2, volume guitare ∈ [0, 10]
-• powerLevel ∈ {1, 20, 30}
+• powerLevel ∈ [1, 30] entier (potard continu)
 
 PROCESSUS DE RAISONNEMENT (silencieux, n'apparaît PAS dans la réponse) :
 1. Identifie la guitare originale et l'ampli original du morceau
 2. Choisis le modèle VT20+ qui modélise (ou approche le mieux) l'ampli original
 3. Détermine si le crunch/saturation vient historiquement du préampli poussé ou d'une pédale (chaîne signal)
 4. Adapte les valeurs en pondérant les principes ci-dessus selon le contexte du morceau
-5. Choisis powerLevel = 1 par défaut (le joueur est en appart), sauf morceau qui ne peut sonner qu'à fort volume (rare)
+5. Choisis powerLevel = 3 par défaut (le joueur joue en appart à ~3W), sauf morceau qui ne peut sonner qu'à fort volume (rare → 15-30)
 6. Vérifie cohérence globale + plages valides avant d'émettre
 
 Réponds ensuite UNIQUEMENT avec le JSON final.`;
