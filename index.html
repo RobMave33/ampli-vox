@@ -98,6 +98,7 @@ body::before{
     radial-gradient(ellipse 80% 50% at 50% 100%, rgba(214,59,59,.04), transparent 70%);
 }
 /* Vertically center when content fits; collapse to top-scroll when it overflows (fixes iPhone clipping) */
+#apiScreen > *{flex-shrink:0;}
 #apiScreen > *:first-child{margin-top:auto;}
 #apiScreen > *:last-child{margin-bottom:auto;}
 #apiScreen.gone{display:none;}
