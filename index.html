@@ -1780,8 +1780,16 @@ VALIDATION DES PLAGES NUMÉRIQUES (impératif) :
 • powerLevel ∈ [1, 30] entier (potard continu)
 
 PROCESSUS DE RAISONNEMENT (silencieux, n'apparaît PAS dans la réponse) :
+
+⚡ ÉTAPE 0 — MATCH FACTORY EN PREMIER (avant tout le reste) :
+a) Scanne la liste des 33 SONG presets ci-dessus.
+b) Le morceau demandé y figure-t-il EXACTEMENT (même titre + même artiste) ? → factoryPreset=true, ampModel+bank de la liste. Saute aux étapes 4-6 (powerLevel + check plages). Tu peux donner des valeurs GAIN/VOLUME/EQ cohérentes en garde-fou mais l'utilisateur activera le preset stocké.
+c) Le morceau est-il très proche d'un des 33 (autre version live/studio du même titre, même artiste sur même album, son identique à ≥ 80 %) ? → idem, factoryPreset=true et utilise le preset comme base.
+d) Si AUCUN match ≥ 80 % → factoryPreset=false, et seulement maintenant continue avec les étapes 1-6 ci-dessous pour calculer les réglages MANUEL.
+
+ÉTAPES SUIVANTES (uniquement si factoryPreset=false) :
 1. Identifie la guitare originale et l'ampli original du morceau
-2. Choisis le modèle VT20+ qui modélise (ou approche le mieux) l'ampli original
+2. Choisis le modèle VT20+ qui modélise (ou approche le mieux) l'ampli original. Si un preset factory à 50-80 % de match existe, tu PEUX réutiliser son ampModel+bank comme point de départ.
 3. Détermine si le crunch/saturation vient historiquement du préampli poussé ou d'une pédale (chaîne signal)
 4. Adapte les valeurs en pondérant les principes ci-dessus selon le contexte du morceau
 5. Choisis powerLevel = 3 par défaut (le joueur joue en appart à ~3W), sauf morceau qui ne peut sonner qu'à fort volume (rare → 15-30)
