@@ -1485,7 +1485,10 @@ function validatePreset(p) {
   p.delayOn = !!p.delayOn;
   p.reverbOn = !!p.reverbOn;
   p.factoryPreset = !!p.factoryPreset;
-  p.pedalValue = _clamp(p.pedalValue, 0, 100, 5);
+  // pedalValue normalized to 0-10 (some older GPT responses returned 0-100 — auto-scale)
+  p.pedalValue = (typeof p.pedalValue === 'number' && p.pedalValue > 10)
+    ? _clamp(p.pedalValue / 10, 0, 10, 5)
+    : _clamp(p.pedalValue, 0, 10, 5);
   p.modDepth = _clamp(p.modDepth, 0, 100, 0);
   p.modSpeed = _clamp(p.modSpeed, 0, 100, 0);
   p.delayTime = _clamp(p.delayTime, 40, 1048, 300);
@@ -1703,7 +1706,8 @@ Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé",
 
 VALIDATION DES PLAGES NUMÉRIQUES (impératif) :
 • gain, volume, treble, middle, bass, master ∈ [0, 10] entier
-• pedalValue, modDepth (en /100), modSpeed (en /100), reverbMix ∈ [0, 100]
+• pedalValue ∈ [0, 10] entier (même échelle que les knobs façade VT20+)
+• modDepth (en /100), modSpeed (en /100), reverbMix ∈ [0, 100]
 • delayTime ∈ [40, 1048] (ms)
 • delayFb ∈ [0, 100]
 • pickup ∈ {1, 2, 3, 4, 5}, tone, tone2, volume guitare ∈ [0, 10]
@@ -1800,7 +1804,7 @@ CONTRAINTES IDENTIQUES À UN PRESET NEUF :
 • Le joueur utilise le VT20+ en appartement (~3W). POWER LEVEL reste un atténuateur — ne sous-dimensionne pas le crunch.
 • Chaîne signal : GUITARE → PEDAL → AMP MODEL → MOD/DELAY → REVERB → HP 8".
 • Modèles d'ampli VT20+ disponibles : CLEAN, CALI CLEAN, US BLUES, US 2x12, VOX AC15, VOX AC30, UK ROCK, UK METAL, US HIGH GAIN, US METAL, BOUTIQUE METAL. Chacun a 3 banques STD/SPL/CST.
-• Plages valides : gain/volume/treble/middle/bass/master ∈ [0,10] ; pedalValue/modDepth/modSpeed/reverbMix ∈ [0,100] ; delayTime ∈ [40,1048] ms ; delayFb ∈ [0,100] ; pickup ∈ {1,2,3,4,5} ; tone/tone2/volume guitare ∈ [0,10] ; powerLevel ∈ [1,30].
+• Plages valides : gain/volume/treble/middle/bass/master ∈ [0,10] ; pedalValue ∈ [0,10] (knob façade VT20+) ; modDepth/modSpeed/reverbMix ∈ [0,100] ; delayTime ∈ [40,1048] ms ; delayFb ∈ [0,100] ; pickup ∈ {1,2,3,4,5} ; tone/tone2/volume guitare ∈ [0,10] ; powerLevel ∈ [1,30].
 • PEDAL : OFF, COMP, ACOUSTIC, AUTO WAH, U-VIBE, BRN OCTAVE, TREBLE BOOST, TUBE OD, GOLD DRIVE, ORG DIST, METAL DIST, FUZZ.
 • MOD/DELAY : OFF, CE CHORUS, MULTI CHORUS, FLANGER, ORG PHASE, TWIN TREM, G4 ROTARY, PITCH SHIFT, FILTRON, TAPE ECHO, DELAY, CHORUS+DELAY.
 • REVERB : OFF, ROOM, SPRING, HALL.
