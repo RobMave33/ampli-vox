@@ -1525,7 +1525,6 @@ Réponds ensuite UNIQUEMENT avec le JSON final.`;
       },
       body: JSON.stringify({
         model: "gpt-5",
-        temperature: 0.4,
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: sys },
