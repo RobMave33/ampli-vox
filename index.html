@@ -607,7 +607,7 @@ body::before{
   <div class="api-card">
     <div class="api-heading"><span class="dot"></span>Clé API OpenAI</div>
     <div class="api-desc">
-      L'app utilise <strong>GPT-4o</strong> (OpenAI) pour analyser n'importe quel morceau et te donner les réglages VOX VT20+ (combo 30W, 11 modèles × 3 banques STD/SPL/CST) adaptés à ta Strat.<br><br>
+      L'app utilise <strong>GPT-5</strong> (OpenAI) pour analyser n'importe quel morceau et te donner les réglages VOX VT20+ (combo 30W, 11 modèles × 3 banques STD/SPL/CST) adaptés à ta Strat.<br><br>
       Ta clé reste <strong>uniquement sur cet appareil</strong> (localStorage). Elle n'est jamais envoyée ailleurs qu'à l'API OpenAI.<br><br>
       Obtiens ta clé sur <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com → API Keys</a>.
     </div>
@@ -641,12 +641,12 @@ body::before{
 
 <!-- PAGE MORCEAUX -->
 <div class="page active" id="page-search">
-  <div class="sec-lbl">Recherche GPT-4o — n'importe quel morceau</div>
+  <div class="sec-lbl">Recherche GPT-5 — n'importe quel morceau</div>
   <div class="search-row">
     <input class="search-inp" id="aiInp" placeholder="Ex: Sultans of Swing, Texas Flood, Money for Nothing…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
     <button class="go-btn" id="goBtn" onclick="searchSong()">GO</button>
   </div>
-  <div class="loading" id="loadEl"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-4o analyse le son…</span></div>
+  <div class="loading" id="loadEl"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-5 analyse le son…</span></div>
   <div class="err-msg" id="errEl"></div>
 
   <div class="sec-lbl" id="libLbl">Ma bibliothèque
@@ -1069,6 +1069,18 @@ const P = {
     ],
     tip: "💡 <strong>FUZZ</strong> dans Pedal pour la texture. <strong>FLANGER</strong> profond (G4 Rotary, Depth élevé) pour le groove robotique. Active NR SENS — les single coils bourdonnent à ce gain."
   },
+  johnnybgoode: { title: "Johnny B. Goode (BTTF)", artist: "Chuck Berry / Marty McFly", genre: "Rock'n'Roll",
+    ampModel: "VOX AC15", bank: "STD", ampReal: "Fender Bassman 4x10 / Tweed Twin (ES-345 + tweed à fond)",
+    gain: 5, volume: 8, treble: 6, middle: 7, bass: 4, master: 6,
+    pedal: "TREBLE BOOST", pedalOn: false, pedalValue: 3, modType: "OFF", modOn: false, modDepth: 0, modSpeed: 0,
+    delayOn: false, delayTime: 0, delayFb: 0, reverb: "SPRING", reverbOn: true, reverbMix: 30,
+    guitar: { pickup: 4, tone: 7, tone2: 7, volume: 8, note: "Marty joue une Gibson ES-345 (semi-hollow + humbuckers). Sur ta Strat, position INTER-CHEVALET (4) = meilleur compromis pour le quack rock'n'roll avec un peu de corps humbucker. Tone à 7 pour adoucir les Texas Special. Volume guitare à 8 (pas 10) — sinon ça pique. Attaque au médiator vers le MILIEU du corps, PAS près du chevalet — sinon ça devient honky." },
+    guitarNote: "🎯 <strong>Strat ≠ ES-345 humbucker semi-hollow.</strong> On ne reproduira pas 100% du son Marty, mais on s'en approche : <strong>position 4 (inter-chevalet)</strong>, tones à 7, volume guitare 8, attaque plus douce et plus loin du chevalet. Le son vient du <strong>préampli poussé</strong> (VOLUME 8, GAIN 5) — PAS d'une pédale OD. La SPRING REVERB est essentielle pour la signature 50s/60s.",
+    extPedals: [
+      { icon: "🟡", name: "Boss FBM-1 / Catalinbread Formula 5F6 (option)", desc: "Émule un Bassman tweed — alternative si tu veux plus de chaleur que l'AC15 STD. Drive bas, Level haut.", params: [{ n: "DRIVE", v: 3 }, { n: "TONE", v: 6 }, { n: "LEVEL", v: 7 }], opt: true }
+    ],
+    tip: "💡 <strong>Le piège classique sur ce morceau :</strong> mettre une OD à fond et TREBLE bas pour 'épaissir' la Strat. C'est l'inverse qu'il faut faire — TREBLE 6, MIDDLE 7, GAIN modéré, et le breakup vient du <strong>VOLUME 8</strong> qui pousse le préampli. Si tu veux un peu plus de mordant, active TREBLE BOOST à VALUE 3 (pas plus). <strong>Test alternatif :</strong> si AC15 trop chimey, essaye <strong>US BLUES STD</strong> (Bassman) ou <strong>CALI CLEAN SPL</strong> (Tweed Twin 57) avec les mêmes réglages. Joue plus mou et plus près du milieu du corps pour casser la nasalité du chevalet."
+  },
   daftpunk: { title: "Get Lucky (solo)", artist: "Daft Punk / Nile Rodgers", genre: "Funk",
     ampModel: "CALI CLEAN", bank: "STD", ampReal: "Fender Pro 6G5-A (clean chaud funk)",
     gain: 2, volume: 7, treble: 6, middle: 5, bass: 4, master: 6,
@@ -1304,6 +1316,28 @@ async function searchSong() {
 
   const sys = `Tu es un expert en son de guitare et en amplificateur VOX VT20+ (combo 30W, HP 8", lampe 12AX7 Valve Reactor).
 ${GUITAR_CTX}
+
+═══ RÈGLES CRITIQUES DE COMPENSATION STRAT TEXAS SPECIAL ═══
+Le joueur utilise une Strat à single-coils Texas Special — c'est PHYSIQUEMENT DIFFÉRENT de la plupart des guitares de référence (Les Paul, ES-335, Telecaster). Tu DOIS compenser :
+
+1. AIGUS — Les Texas Special ont DÉJÀ beaucoup de présence dans les hauts médiums. NE BAISSE PAS TREBLE en dessous de 5, sinon le son devient honky/nasal/orgue. Pour un morceau humbucker (Les Paul/ES), garde TREBLE à 6-7 et compense la "brillance perçue" via le TONE de la guitare (5-7) et la position de micro, PAS via l'ampli.
+
+2. MÉDIUMS — Pour reproduire la chaleur d'un humbucker sur une Strat, PUSH le MIDDLE de l'ampli (6-8). Le bridge Strat seul est nasal — préfère la position 4 (inter-chevalet/milieu) ou 2 (inter-manche/milieu) qui donne un caractère "humbucker split" plus rond.
+
+3. BASSES — Le HP 8" du VT20+ SATURE physiquement au-dessus de BASS 5. Si la chanson originale a beaucoup de bas (P90, humbucker manche, semi-hollow), NE MONTE PAS BASS au-delà de 5 — ça donne un "squich" mou. Mets BASS à 4-5 et compense via VOLUME guitare et tone neck à 8+.
+
+4. AMPLI POUSSÉ ≠ OD PAR-DESSUS — Pour les sons 50s/60s/70s (Chuck Berry, Hendrix clean, AC/DC, Stones, blues), le breakup vient du PRÉAMPLI poussé, PAS d'une pédale par-dessus un clean. Mets GAIN modéré (4-6), VOLUME haut (7-9), MASTER à 5-6 pour le niveau, et LAISSE PEDAL OFF ou à très basse VALUE (2-3) en TREBLE BOOST ou TUBE OD comme "kick" sans drive. Une OD à VALUE 5+ par-dessus un clean sonne synthétique et écrase la dynamique.
+
+5. SIMULATION HUMBUCKER — Pour les morceaux iconiquement humbucker (Page, Slash, Iommi, Marty BTTF/Chuck Berry sur ES-345), la meilleure stratégie sur Strat est : (a) position micro 4 ou 2 (jamais 5 seul), (b) MIDDLE de l'ampli haut (7-8), (c) TONE manche guitare à 6-7 pour adoucir, (d) jouer plus loin du chevalet — précise-le dans la note guitare.
+
+6. SIMULATION P90 — Position 5 (bridge Strat) avec TONE à 5-6, c'est la meilleure approximation P90 sur ta Strat (mordant + un peu de chaleur).
+
+7. SINGLE-COIL + HIGH GAIN — Au-dessus de GAIN 7, les Texas Special captent énormément de bruit/parasites. Recommande explicitement le NS-2 / activation du NR SENS sur l'ampli dans le tip et guitarNote.
+
+8. MÉDIATOR ÉPAIS — Le joueur a un médiator rigide → attaque accentuée → pour les morceaux qui demandent du legato/douceur (Comfortably Numb solo, jazz, ballade), précise dans la note guitare : "joue plus mou / plus près du manche".
+
+═══ FIN DES RÈGLES DE COMPENSATION ═══
+
 IMPORTANT : utilise UNIQUEMENT les modèles d'ampli réellement présents sur le VT20+. Chaque modèle a 3 banques (STD/SPL/CST) sélectionnables avec le bouton AMP (vert/orange/rouge).
 
 11 MODÈLES D'AMPLI (33 sons au total avec les banques) :
@@ -1326,7 +1360,16 @@ PEDAL effects (1 seul à la fois, knob VALUE règle paramètre principal) : COMP
 MOD/DELAY effects (1 seul à la fois, knobs DEPTH + TAP/SPEED) : CE CHORUS, MULTI CHORUS, FLANGER, ORG PHASE, TWIN TREM, G4 ROTARY, PITCH SHIFT, FILTRON, TAPE ECHO (40-1048ms), DELAY (40-1048ms), CHORUS+DELAY.
 REVERB types : ROOM, SPRING, HALL.
 
-Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé", artist="Essaie un autre titre", valeurs neutres.`;
+Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé", artist="Essaie un autre titre", valeurs neutres.
+
+PROCESSUS DE RAISONNEMENT (silencieux, n'apparaît PAS dans la réponse) :
+1. Identifie la guitare originale (humbucker/single-coil/P90/semi-hollow) et l'ampli original
+2. Choisis le modèle VT20+ qui modélise l'ampli original (ou le plus proche)
+3. Calcule les valeurs de base que tu donnerais avec la guitare originale
+4. APPLIQUE LES COMPENSATIONS STRAT TEXAS SPECIAL ci-dessus pour adapter
+5. Vérifie cohérence : si l'original est humbucker semi-hollow et tu mets bridge pickup + treble bas + OD haut, c'est INCOHÉRENT — refais
+
+Réponds ensuite UNIQUEMENT avec le JSON final.`;
 
   try {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -1336,8 +1379,8 @@ Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé",
         "Authorization": "Bearer " + k
       },
       body: JSON.stringify({
-        model: "gpt-4o",
-        temperature: 0.3,
+        model: "gpt-5",
+        temperature: 0.4,
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: sys },
