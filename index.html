@@ -1685,12 +1685,16 @@ La Strat à single-coils Texas Special est physiquement différente des guitares
 ═══ EXEMPLES (few-shot, pour calibrer ton raisonnement) ═══
 
 EXEMPLE 1 — entrée : "Back in Black, AC/DC"
-Raisonnement (NE PAS METTRE DANS LA RÉPONSE) : Angus Young joue une SG (humbucker) dans un Marshall Plexi/JTM45 dimed. Crunch = ampli poussé, pas pédale. Pour Strat compenser : MIDDLE haut, position 4 ou 5, NR SENS modéré. POWER LEVEL ~3W pour appart.
-Sortie correcte : ampModel="UK ROCK", bank="CST" (Plexi 50W), gain≈6, volume≈9, treble≈7, middle≈7, bass≈5, master≈6, pedal="OFF" ou "TREBLE BOOST" VALUE 3, modOn=false, reverb="SPRING" mix 15-20, pickup=5, tones=8, volume guitare=10, powerLevel=3.
+Raisonnement (NE PAS METTRE DANS LA RÉPONSE) : Ce morceau est DANS la liste des 33 SONG presets factory du VT20+ → US 2x12 CST (LED bank rouge). Donc factoryPreset=true. Le VT20+ charge ses propres GAIN/VOLUME/EQ — j'indique quand même des valeurs cohérentes comme garde-fou si l'utilisateur passe en MANUAL. Angus Young joue SG/humbucker, pour Strat compenser : MIDDLE haut, position 4 ou 5.
+Sortie correcte : ampModel="US 2x12", bank="CST", factoryPreset=true, ampReal="Fender Twin actif crunch modifié (preset factory VT20+ Back In Black)", gain≈6, volume≈7, treble≈7, middle≈7, bass≈5, master≈7, pedal="OFF", modOn=false, reverb="SPRING" mix 15-20, pickup=5, tones=8, volume guitare=10, powerLevel=3.
 
 EXEMPLE 2 — entrée : "Enter Sandman, Metallica"
-Raisonnement : Hetfield joue une ESP (humbucker actif) dans Mesa Boogie Mark IIC+/Dual Rectifier. High-gain MODERNE → préamp propre + OD push. Pour Strat → NS-2 obligatoire, MIDDLE bas (scooped), TREBLE haut (compense la perte single-coil sur disto). POWER LEVEL ~3W appart ok.
-Sortie correcte : ampModel="US METAL", bank="STD" (Dual Recto), gain≈8, volume≈5, treble≈7, middle≈3, bass≈6, master≈6, pedal="TUBE OD" pedalOn=true VALUE 7 (pour tightener et booster), modOn=false, reverb="ROOM" mix 10, pickup=5, tones=10, volume guitare=10, NR SENS recommandé à 6, NS-2 dans extPedals, powerLevel=3.
+Raisonnement : Morceau dans la liste factory → UK METAL STD (LED bank vert). factoryPreset=true. Hetfield joue ESP humbucker → pour Strat NS-2 recommandé, MIDDLE bas (scooped), TREBLE haut.
+Sortie correcte : ampModel="UK METAL", bank="STD", factoryPreset=true, ampReal="Marshall JCM2000 100W (preset factory VT20+ Enter Sandman)", gain≈8, volume≈5, treble≈7, middle≈3, bass≈6, master≈6, pedal="TUBE OD" pedalOn=true VALUE 7, modOn=false, reverb="ROOM" mix 10, pickup=5, tones=10, volume guitare=10, NR SENS 6, NS-2 dans extPedals, powerLevel=3.
+
+EXEMPLE 3 (HORS LISTE FACTORY) — entrée : "Wish You Were Here, Pink Floyd"
+Raisonnement : N'est PAS dans les 33 SONG presets factory. factoryPreset=false → mode MANUAL. Gilmour joue Strat en clean breakup avec léger crunch, son aérien. UK ROCK STD (JTM45 tweed) ou VOX AC30 STD selon goût.
+Sortie correcte : ampModel="UK ROCK", bank="STD", factoryPreset=false, gain≈4, volume≈6, treble≈6, middle≈5, bass≈5, master≈6, reverb="HALL" mix 30, pickup=1 (manche pour solo), tones=7, powerLevel=3.
 
 ═══ FIN DES EXEMPLES ═══
 
