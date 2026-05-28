@@ -43,6 +43,38 @@ body{display:flex;flex-direction:column;height:100dvh;}
 
 ::selection{background:var(--accent);color:#000;}
 
+/* ── CUSTOM SCROLLBARS (desktop) ────────────────── */
+.page,.api-card,.knob-scroll,.vt-row{
+  scrollbar-width:thin;
+  scrollbar-color:rgba(240,168,48,.35) rgba(0,0,0,.25);
+}
+.page::-webkit-scrollbar{width:10px;height:10px;}
+.page::-webkit-scrollbar-track{
+  background:rgba(0,0,0,.35);
+  border-left:1px solid var(--border-soft);
+}
+.page::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,rgba(240,168,48,.5),rgba(240,168,48,.25));
+  border-radius:5px;border:2px solid transparent;
+  background-clip:padding-box;
+  transition:background .2s;
+}
+.page::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,rgba(240,168,48,.75),rgba(240,168,48,.45));
+  background-clip:padding-box;border:2px solid transparent;
+}
+.page::-webkit-scrollbar-corner{background:transparent;}
+
+/* Page-wide scrollbar (body / html if ever) */
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:10px;}
+html::-webkit-scrollbar-track,body::-webkit-scrollbar-track{background:var(--bg-soft);}
+html::-webkit-scrollbar-thumb,body::-webkit-scrollbar-thumb{
+  background:rgba(240,168,48,.35);border-radius:5px;
+}
+html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{
+  background:rgba(240,168,48,.6);
+}
+
 /* Subtle grain texture overlay */
 body::before{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
@@ -851,7 +883,12 @@ let currentDisplay = null;
 function changePlayMode(id) {
   setPlayModeLS(id);
   toast(`Mode : ${POWER_MODES.find(m=>m.id===id).lbl} — règle ton POWER LEVEL sur ${POWER_MODES.find(m=>m.id===id).w} W`);
-  if (currentDisplay) render(currentDisplay);
+  if (currentDisplay) {
+    const page = document.getElementById('page-amp');
+    const savedScroll = page ? page.scrollTop : 0;
+    render(currentDisplay, { keepScroll: true });
+    if (page) page.scrollTop = savedScroll;
+  }
 }
 
 /* ── CHICKENHEAD KNOB (cream, for EQ) ─────────────── */
@@ -1318,7 +1355,8 @@ function clearLib() {
 const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
 /* ── RENDER ───────────────────────────────────────── */
-function render(d) {
+function render(d, opts) {
+  opts = opts || {};
   currentDisplay = d;
   document.getElementById('ph').style.display = 'none';
   const ad = document.getElementById('ad');
@@ -1410,7 +1448,7 @@ function render(d) {
   document.getElementById('ampTab').classList.add('active');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-amp').classList.add('active');
-  document.getElementById('page-amp').scrollTop = 0;
+  if (!opts.keepScroll) document.getElementById('page-amp').scrollTop = 0;
 }
 
 function switchTab(id, btn) {
