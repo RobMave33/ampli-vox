@@ -266,6 +266,43 @@ body::before{
 @keyframes bop{0%,60%,100%{transform:translateY(0);opacity:.3;}30%{transform:translateY(-5px);opacity:1;}}
 .err-msg{color:var(--accent-2);font-family:'JetBrains Mono',monospace;font-size:.72rem;display:none;padding:10px 12px;background:rgba(214,59,59,.08);border:1px solid rgba(214,59,59,.25);border-radius:6px;line-height:1.5;}
 .err-msg.on{display:block;}
+.adjust-btn{
+  margin-top:4px;width:100%;padding:11px 14px;border-radius:var(--r-sm);cursor:pointer;
+  background:rgba(240,168,48,.08);border:1px solid rgba(240,168,48,.35);color:var(--accent);
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:1.5px;
+  transition:background .15s,border-color .15s,transform .1s;
+}
+.adjust-btn:hover{background:rgba(240,168,48,.16);border-color:var(--accent);}
+.adjust-btn:active{transform:scale(.99);}
+.adj-overlay{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.72);backdrop-filter:blur(4px);
+  align-items:flex-start;justify-content:center;padding:6vh 14px;overflow-y:auto;
+}
+.adj-overlay.on{display:flex;}
+.adj-modal{
+  width:100%;max-width:540px;background:var(--bg);border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden;
+}
+.adj-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);background:rgba(240,168,48,.04);
+}
+.adj-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--accent);}
+.adj-x{background:none;border:none;color:var(--muted);font-size:1.6rem;cursor:pointer;line-height:1;padding:0 6px;}
+.adj-x:hover{color:var(--text);}
+.adj-body{padding:18px;display:flex;flex-direction:column;gap:10px;}
+.adj-hint{margin:0 0 4px 0;font-size:.8rem;color:var(--muted);line-height:1.5;}
+.adj-lbl{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:1.5px;color:var(--muted-2);text-transform:uppercase;margin-top:6px;}
+.adj-ta,.adj-inp{
+  width:100%;background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:10px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:.88rem;
+  outline:none;transition:border-color .2s,box-shadow .2s;resize:vertical;
+}
+.adj-ta:focus,.adj-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.adj-err{color:var(--accent-2);font-family:'JetBrains Mono',monospace;font-size:.7rem;display:none;}
+.adj-err.on{display:block;}
+.adj-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;flex-wrap:wrap;}
 
 .song-grid{display:grid;gap:10px;grid-template-columns:1fr 1fr;}
 @media(max-width:400px){.song-grid{grid-template-columns:1fr;}}
@@ -776,6 +813,32 @@ body::before{
       <div id="pedList" style="display:flex;flex-direction:column;gap:9px;"></div>
     </div>
     <div class="tip" id="tipBox"></div>
+    <button class="adjust-btn" id="adjustBtn" onclick="openAdjust()">✏️ Ajuster ce preset</button>
+  </div>
+</div>
+
+<!-- ADJUST MODAL -->
+<div class="adj-overlay" id="adjOverlay" onclick="if(event.target===this)closeAdjust()">
+  <div class="adj-modal">
+    <div class="adj-head">
+      <div class="adj-title">Ajuster ce preset</div>
+      <button class="adj-x" onclick="closeAdjust()">×</button>
+    </div>
+    <div class="adj-body">
+      <p class="adj-hint">
+        Décris ce qui cloche par rapport au son que tu veux — ou colle l'analyse de GPT thinking après avoir comparé ton enregistrement à la vidéo de référence.
+        GPT-5 régénère le preset en intégrant ce feedback.
+      </p>
+      <label class="adj-lbl">Feedback / diagnose</label>
+      <textarea id="adjFeedback" class="adj-ta" rows="7" placeholder="Ex : le son est trop sombre, il manque le claquant du médiator ; ajouter un slapback delay style 50s ; baisser les basses ; pousser les aigus…"></textarea>
+      <label class="adj-lbl">Référence YouTube (optionnel)</label>
+      <input id="adjYt" class="adj-inp" type="text" placeholder="https://www.youtube.com/watch?v=…" />
+      <div class="adj-err" id="adjErr"></div>
+      <div class="adj-actions">
+        <div class="loading" id="adjLoad"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-5 ajuste le preset…</span></div>
+        <button class="go-btn" id="adjGo" onclick="submitAdjust()">APPLIQUER</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -880,6 +943,7 @@ const MODE_LS = 'vox_play_mode';
 const getPlayMode = () => { try { return localStorage.getItem(MODE_LS) || 'appart'; } catch { return 'appart'; } };
 const setPlayModeLS = id => { try { localStorage.setItem(MODE_LS, id); } catch {} };
 let currentDisplay = null;
+let currentSource = null; /* {type:'factory'|'custom', key?:string, index?:number} */
 function changePlayMode(id) {
   setPlayModeLS(id);
   toast(`Mode : ${POWER_MODES.find(m=>m.id===id).lbl} — règle ton POWER LEVEL sur ${POWER_MODES.find(m=>m.id===id).w} W`);
@@ -1282,8 +1346,8 @@ function renderGrid() {
       const c = el.dataset.custom, pk = el.dataset.preset;
       grid.querySelectorAll('.song-item').forEach(e => e.classList.remove('active'));
       el.classList.add('active');
-      if (c !== undefined) render(getCustom()[+c]);
-      else render(P[pk]);
+      if (c !== undefined) { currentSource = { type:'custom', index:+c }; render(getCustom()[+c]); }
+      else { currentSource = { type:'factory', key:pk }; render(P[pk]); }
     });
   });
   grid.querySelectorAll('.si-del').forEach(btn => {
@@ -1581,6 +1645,7 @@ Réponds ensuite UNIQUEMENT avec le JSON final.`;
     saveCustom(custom);
     renderGrid();
     document.querySelector('.song-item[data-custom="0"]').classList.add('active');
+    currentSource = { type:'custom', index:0 };
     render(preset);
     inp.value = '';
     toast('✓ Morceau ajouté');
@@ -1595,6 +1660,117 @@ function showErr(msg) {
   errEl.classList.add('on');
 }
 document.getElementById('aiInp').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); searchSong(); } });
+
+/* ── ADJUST PRESET ─────────────────────────────────── */
+function openAdjust() {
+  if (!currentDisplay || !currentSource) { toast('Sélectionne d\'abord un morceau'); return; }
+  if (!getKey()) { toast('Clé OpenAI manquante'); return; }
+  document.getElementById('adjFeedback').value = '';
+  document.getElementById('adjYt').value = '';
+  document.getElementById('adjErr').classList.remove('on');
+  document.getElementById('adjLoad').classList.remove('on');
+  document.getElementById('adjGo').disabled = false;
+  document.getElementById('adjOverlay').classList.add('on');
+  setTimeout(() => document.getElementById('adjFeedback').focus(), 50);
+}
+function closeAdjust() {
+  document.getElementById('adjOverlay').classList.remove('on');
+}
+async function submitAdjust() {
+  const feedback = document.getElementById('adjFeedback').value.trim();
+  const yt = document.getElementById('adjYt').value.trim();
+  const errEl = document.getElementById('adjErr');
+  errEl.classList.remove('on');
+  if (!feedback) { errEl.textContent = 'Décris au moins ce que tu veux corriger.'; errEl.classList.add('on'); return; }
+  const k = getKey();
+  if (!k) { errEl.textContent = 'Clé OpenAI manquante.'; errEl.classList.add('on'); return; }
+
+  const btn = document.getElementById('adjGo'), loadEl = document.getElementById('adjLoad');
+  btn.disabled = true; loadEl.classList.add('on');
+
+  const sys = `Tu es un expert en son de guitare et en VOX VT20+. Le joueur a déjà un preset qu'il a essayé sur son ampli, et il te dit ce qui ne va pas par rapport au son qu'il veut entendre. Ta tâche : produire une version corrigée du preset.
+
+${GUITAR_CTX}
+
+CONTRAINTES IDENTIQUES À UN PRESET NEUF :
+• Le joueur utilise le VT20+ en appartement (~3W). POWER LEVEL reste un atténuateur — ne sous-dimensionne pas le crunch.
+• Chaîne signal : GUITARE → PEDAL → AMP MODEL → MOD/DELAY → REVERB → HP 8".
+• Modèles d'ampli VT20+ disponibles : CLEAN, CALI CLEAN, US BLUES, US 2x12, VOX AC15, VOX AC30, UK ROCK, UK METAL, US HIGH GAIN, US METAL, BOUTIQUE METAL. Chacun a 3 banques STD/SPL/CST.
+• Plages valides : gain/volume/treble/middle/bass/master ∈ [0,10] ; pedalValue/modDepth/modSpeed/reverbMix ∈ [0,100] ; delayTime ∈ [40,1048] ms ; delayFb ∈ [0,100] ; pickup ∈ {1,2,3,4,5} ; tone/tone2/volume guitare ∈ [0,10] ; powerLevel ∈ [1,30].
+• PEDAL : OFF, COMP, ACOUSTIC, AUTO WAH, U-VIBE, BRN OCTAVE, TREBLE BOOST, TUBE OD, GOLD DRIVE, ORG DIST, METAL DIST, FUZZ.
+• MOD/DELAY : OFF, CE CHORUS, MULTI CHORUS, FLANGER, ORG PHASE, TWIN TREM, G4 ROTARY, PITCH SHIFT, FILTRON, TAPE ECHO, DELAY, CHORUS+DELAY.
+• REVERB : OFF, ROOM, SPRING, HALL.
+
+MÉTHODE D'AJUSTEMENT :
+1. Lis attentivement le feedback du joueur — il a essayé le preset en vrai. Son retour est plus fiable que ton intuition initiale.
+2. Si une référence YouTube est fournie, base-toi sur ta connaissance du son de ce morceau/version pour orienter les corrections.
+3. Modifie UNIQUEMENT ce qui sert le feedback. Ne change pas les paramètres déjà bons. Reste cohérent avec l'identité du preset (même ampli si possible, sauf si le feedback indique clairement que c'est l'ampli qui est en cause).
+4. Si le joueur dit "trop sombre" → monter TREBLE, monter tones guitare, micro plus chevalet, peut-être TREBLE BOOST.
+5. Si "manque de slapback / vintage" → activer MOD/DELAY en TAPE ECHO 80-150ms, feedback bas (10-25%).
+6. Si "pas assez de crunch" → monter GAIN ou VOLUME, ou ajouter une OD via PEDAL, ou changer banque.
+7. Si "trop saturé" → baisser GAIN, virer pédale OD, baisser volume guitare.
+8. Mets à jour aussi le \`tip\`, \`guitarNote\` et la \`guitar.note\` pour refléter les changements (le joueur lit ces conseils).
+
+RÉPONSE : UNIQUEMENT le JSON complet du preset corrigé, même structure que l'entrée. Pas de markdown, pas de \`\`\`, pas de texte avant/après. Garde title et artist identiques.`;
+
+  const user = `PRESET ACTUEL (à corriger) :
+\`\`\`json
+${JSON.stringify(currentDisplay, null, 2)}
+\`\`\`
+
+FEEDBACK DU JOUEUR (ce qui ne va pas / ce qu'il veut entendre) :
+${feedback}
+${yt ? `\nRÉFÉRENCE YOUTUBE : ${yt}\n` : ''}
+Renvoie le preset ajusté en JSON complet.`;
+
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + k },
+      body: JSON.stringify({
+        model: "gpt-5",
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: sys },
+          { role: "user", content: user }
+        ]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+    const cleaned = raw.replace(/```json|```/g, '').trim();
+    const adjusted = JSON.parse(cleaned);
+    adjusted.adjustedFromKey = currentSource.type === 'factory' ? currentSource.key : (currentDisplay.adjustedFromKey || null);
+    adjusted.adjustedAt = new Date().toISOString();
+
+    const arr = getCustom();
+    if (currentSource.type === 'custom' && typeof currentSource.index === 'number') {
+      arr[currentSource.index] = adjusted;
+      saveCustom(arr);
+      renderGrid();
+      const el = document.querySelector(`.song-item[data-custom="${currentSource.index}"]`);
+      if (el) el.classList.add('active');
+      render(adjusted);
+      toast('✓ Preset ajusté');
+    } else {
+      if (!adjusted.title.toLowerCase().includes('ajusté')) adjusted.title = adjusted.title + ' (ajusté)';
+      arr.unshift(adjusted);
+      saveCustom(arr);
+      renderGrid();
+      currentSource = { type:'custom', index:0 };
+      const el = document.querySelector('.song-item[data-custom="0"]');
+      if (el) el.classList.add('active');
+      render(adjusted);
+      toast('✓ Version ajustée ajoutée à ta biblio');
+    }
+    closeAdjust();
+  } catch (e) {
+    errEl.textContent = "Erreur : " + (e.message || "vérifie ta clé OpenAI.");
+    errEl.classList.add('on');
+  }
+  btn.disabled = false; loadEl.classList.remove('on');
+}
 </script>
 </body>
 </html>
