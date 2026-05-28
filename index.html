@@ -1709,8 +1709,56 @@ IMPORTANT : utilise UNIQUEMENT les modèles d'ampli réellement présents sur le
 10. US METAL — STD: Mesa Dual Rectifier / SPL: Peavey 5150 / CST: Peavey 5150 brown sound (Van Halen)
 11. BOUTIQUE METAL — STD: Diezel Herbert / SPL: ENGL Powerball 4 canaux / CST: high gain moderne actif
 
+═══ 33 SONG PRESETS PRÉ-STOCKÉS EN USINE (LED PRESET ROUGE) ═══
+Le VT20+ a 33 programmes de morceaux stockés en usine, accessibles via le mode SONG (LED PRESET rouge). Si le morceau demandé correspond à un de ces titres (ou est très proche — même artiste / même version / même son à ≥ 80 %), réponds avec factoryPreset=true et l'ampModel+bank EXACTS de la liste ci-dessous. Sinon factoryPreset=false (mode MANUAL).
+
+STD (LED bank vert) :
+• CLEAN — Gravity (John Mayer)
+• CALI CLEAN — Brown Sugar (Rolling Stones)
+• US BLUES — Cocaine (Eric Clapton / J.J. Cale)
+• US 2x12 — Creep (Radiohead)
+• VOX AC15 — I Feel Fine (Beatles)
+• VOX AC30 — Pride (U2)
+• UK ROCK — Foxy Lady (Jimi Hendrix)
+• UK METAL — Enter Sandman (Metallica)
+• US HIGH GAIN — Song 2 (Blur)
+• US METAL — Know Your Enemy (Rage Against The Machine)
+• BOUTIQUE METAL — Blue Wind (Jeff Beck)
+
+SPL (LED bank orange) :
+• CLEAN — Message In A Bottle (The Police)
+• CALI CLEAN — Under The Bridge (Red Hot Chili Peppers)
+• US BLUES — Sultans Of Swing (Dire Straits)
+• US 2x12 — Rebel Rebel (David Bowie)
+• VOX AC15 — You Enjoy Myself (Phish)
+• VOX AC30 — Smoke On The Water (Deep Purple)
+• UK ROCK — Beat It (Michael Jackson / Eddie Van Halen)
+• UK METAL — For The Love Of God (Steve Vai)
+• US HIGH GAIN — Best Of You (Foo Fighters)
+• US METAL — Satch Boogie (Joe Satriani)
+• BOUTIQUE METAL — Smells Like Teen Spirit (Nirvana)
+
+CST (LED bank rouge) :
+• CLEAN — Wonderwall (Oasis)
+• CALI CLEAN — Pride And Joy (Stevie Ray Vaughan)
+• US BLUES — Walk This Way (Aerosmith)
+• US 2x12 — Back In Black (AC/DC)
+• VOX AC15 — Paranoid (Black Sabbath)
+• VOX AC30 — Tie Your Mother Down (Queen)
+• UK ROCK — Black Dog (Led Zeppelin)
+• UK METAL — Sweet Child O' Mine (Guns N' Roses)
+• US HIGH GAIN — Five Minutes Alone (Pantera)
+• US METAL — Hot For Teacher (Van Halen)
+• BOUTIQUE METAL — Raining Blood (Slayer)
+
+RÈGLE DE MATCH FACTORY :
+• Si l'utilisateur demande EXACTEMENT un de ces 33 morceaux (titre + artiste correspondants) → factoryPreset=true, ampModel+bank de la liste, plus besoin de calculer GAIN/VOLUME/EQ précisément (l'utilisateur active juste le preset).
+• Si demande très proche (autre version live/studio du même morceau, même artiste sur même album, son globalement identique à ≥ 80 %) → factoryPreset=true et utilise quand même ce preset comme point de départ.
+• Sinon factoryPreset=false.
+• Garde toujours les valeurs GAIN/VOLUME/EQ cohérentes même si factoryPreset=true (utile en mode manuel de secours).
+
 Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans \`\`\`, sans texte avant ou après. Structure exacte :
-{"title":"Nom","artist":"Artiste","genre":"Genre court","ampModel":"CLEAN|CALI CLEAN|US BLUES|US 2x12|VOX AC15|VOX AC30|UK ROCK|UK METAL|US HIGH GAIN|US METAL|BOUTIQUE METAL","bank":"STD|SPL|CST","ampReal":"vrai ampli original modélisé","gain":5,"volume":6,"treble":5,"middle":5,"bass":5,"master":6,"pedal":"OFF|COMP|ACOUSTIC|AUTO WAH|U-VIBE|BRN OCTAVE|TREBLE BOOST|TUBE OD|GOLD DRIVE|ORG DIST|METAL DIST|FUZZ","pedalOn":false,"pedalValue":5,"modType":"OFF|CE CHORUS|MULTI CHORUS|FLANGER|ORG PHASE|TWIN TREM|G4 ROTARY|PITCH SHIFT|FILTRON|TAPE ECHO|DELAY|CHORUS+DELAY","modOn":false,"modDepth":0,"modSpeed":0,"delayOn":false,"delayTime":300,"delayFb":30,"reverb":"OFF|ROOM|SPRING|HALL","reverbOn":false,"reverbMix":20,"powerLevel":3,"guitar":{"pickup":4,"tone":7,"tone2":7,"volume":10,"note":"note courte réglages guitare Strat — tone=micro manche, tone2=micro milieu (chevalet n'a pas de tone sur Strat)"},"guitarNote":"note courte adaptée Strat single-coil Texas Special","extPedals":[{"icon":"emoji","name":"nom pédale","desc":"description","params":[{"n":"NOM","v":5}],"opt":false}],"tip":"💡 <strong>Strat + médiator épais :</strong> conseil pratique"}
+{"title":"Nom","artist":"Artiste","genre":"Genre court","ampModel":"CLEAN|CALI CLEAN|US BLUES|US 2x12|VOX AC15|VOX AC30|UK ROCK|UK METAL|US HIGH GAIN|US METAL|BOUTIQUE METAL","bank":"STD|SPL|CST","ampReal":"vrai ampli original modélisé","factoryPreset":false,"gain":5,"volume":6,"treble":5,"middle":5,"bass":5,"master":6,"pedal":"OFF|COMP|ACOUSTIC|AUTO WAH|U-VIBE|BRN OCTAVE|TREBLE BOOST|TUBE OD|GOLD DRIVE|ORG DIST|METAL DIST|FUZZ","pedalOn":false,"pedalValue":5,"modType":"OFF|CE CHORUS|MULTI CHORUS|FLANGER|ORG PHASE|TWIN TREM|G4 ROTARY|PITCH SHIFT|FILTRON|TAPE ECHO|DELAY|CHORUS+DELAY","modOn":false,"modDepth":0,"modSpeed":0,"delayOn":false,"delayTime":300,"delayFb":30,"reverb":"OFF|ROOM|SPRING|HALL","reverbOn":false,"reverbMix":20,"powerLevel":3,"guitar":{"pickup":4,"tone":7,"tone2":7,"volume":10,"note":"note courte réglages guitare Strat — tone=micro manche, tone2=micro milieu (chevalet n'a pas de tone sur Strat)"},"guitarNote":"note courte adaptée Strat single-coil Texas Special","extPedals":[{"icon":"emoji","name":"nom pédale","desc":"description","params":[{"n":"NOM","v":5}],"opt":false}],"tip":"💡 <strong>Strat + médiator épais :</strong> conseil pratique"}
 
 PEDAL effects (1 seul à la fois, knob VALUE règle paramètre principal) : COMP (SENS), ACOUSTIC (TONE), AUTO WAH (SENS), U-VIBE (SPEED), BRN OCTAVE (LEVEL), TREBLE BOOST (GAIN), TUBE OD (GAIN), GOLD DRIVE (GAIN), ORG DIST (GAIN), METAL DIST (GAIN), FUZZ (GAIN).
 MOD/DELAY effects (1 seul à la fois, knobs DEPTH + TAP/SPEED) : CE CHORUS, MULTI CHORUS, FLANGER, ORG PHASE, TWIN TREM, G4 ROTARY, PITCH SHIFT, FILTRON, TAPE ECHO (40-1048ms), DELAY (40-1048ms), CHORUS+DELAY.
@@ -1822,6 +1870,7 @@ CONTRAINTES IDENTIQUES À UN PRESET NEUF :
 • PEDAL : OFF, COMP, ACOUSTIC, AUTO WAH, U-VIBE, BRN OCTAVE, TREBLE BOOST, TUBE OD, GOLD DRIVE, ORG DIST, METAL DIST, FUZZ.
 • MOD/DELAY : OFF, CE CHORUS, MULTI CHORUS, FLANGER, ORG PHASE, TWIN TREM, G4 ROTARY, PITCH SHIFT, FILTRON, TAPE ECHO, DELAY, CHORUS+DELAY.
 • REVERB : OFF, ROOM, SPRING, HALL.
+• Conserve le champ factoryPreset tel qu'il est (true uniquement si le preset correspond à un des 33 SONG presets pré-stockés en usine). Si le feedback indique un changement d'ampli majeur qui s'éloigne du preset factory, passe-le à false.
 
 MÉTHODE D'AJUSTEMENT :
 1. Lis attentivement le feedback du joueur — il a essayé le preset en vrai. Son retour est plus fiable que ton intuition initiale.
