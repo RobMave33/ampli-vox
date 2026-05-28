@@ -1072,14 +1072,14 @@ const P = {
   johnnybgoode: { title: "Johnny B. Goode (BTTF)", artist: "Chuck Berry / Marty McFly", genre: "Rock'n'Roll",
     ampModel: "VOX AC15", bank: "STD", ampReal: "Fender Bassman 4x10 / Tweed Twin (ES-345 + tweed à fond)",
     gain: 5, volume: 8, treble: 6, middle: 7, bass: 4, master: 6,
-    pedal: "TREBLE BOOST", pedalOn: false, pedalValue: 3, modType: "OFF", modOn: false, modDepth: 0, modSpeed: 0,
+    pedal: "TREBLE BOOST", pedalOn: true, pedalValue: 3, modType: "OFF", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: false, delayTime: 0, delayFb: 0, reverb: "SPRING", reverbOn: true, reverbMix: 30,
     guitar: { pickup: 4, tone: 7, tone2: 7, volume: 8, note: "Marty joue une Gibson ES-345 (semi-hollow + humbuckers). Sur ta Strat, position INTER-CHEVALET (4) = meilleur compromis pour le quack rock'n'roll avec un peu de corps humbucker. Tone à 7 pour adoucir les Texas Special. Volume guitare à 8 (pas 10) — sinon ça pique. Attaque au médiator vers le MILIEU du corps, PAS près du chevalet — sinon ça devient honky." },
     guitarNote: "🎯 <strong>Strat ≠ ES-345 humbucker semi-hollow.</strong> On ne reproduira pas 100% du son Marty, mais on s'en approche : <strong>position 4 (inter-chevalet)</strong>, tones à 7, volume guitare 8, attaque plus douce et plus loin du chevalet. Le son vient du <strong>préampli poussé</strong> (VOLUME 8, GAIN 5) — PAS d'une pédale OD. La SPRING REVERB est essentielle pour la signature 50s/60s.",
     extPedals: [
       { icon: "🟡", name: "Boss FBM-1 / Catalinbread Formula 5F6 (option)", desc: "Émule un Bassman tweed — alternative si tu veux plus de chaleur que l'AC15 STD. Drive bas, Level haut.", params: [{ n: "DRIVE", v: 3 }, { n: "TONE", v: 6 }, { n: "LEVEL", v: 7 }], opt: true }
     ],
-    tip: "💡 <strong>Le piège classique sur ce morceau :</strong> mettre une OD à fond et TREBLE bas pour 'épaissir' la Strat. C'est l'inverse qu'il faut faire — TREBLE 6, MIDDLE 7, GAIN modéré, et le breakup vient du <strong>VOLUME 8</strong> qui pousse le préampli. Si tu veux un peu plus de mordant, active TREBLE BOOST à VALUE 3 (pas plus). <strong>Test alternatif :</strong> si AC15 trop chimey, essaye <strong>US BLUES STD</strong> (Bassman) ou <strong>CALI CLEAN SPL</strong> (Tweed Twin 57) avec les mêmes réglages. Joue plus mou et plus près du milieu du corps pour casser la nasalité du chevalet."
+    tip: "💡 <strong>Le piège classique sur ce morceau :</strong> mettre une OD à fond et TREBLE bas pour 'épaissir' la Strat. C'est l'inverse qu'il faut faire — TREBLE 6, MIDDLE 7, GAIN modéré, et le breakup vient du <strong>VOLUME 8</strong> qui pousse le préampli. La pédale <strong>TREBLE BOOST à VALUE 3</strong> (ON) ajoute le mordant signature Chuck Berry sans saturer — ne monte pas au-delà sinon ça devient piquant. Si tu veux le son brut sans kick, mets PEDAL sur OFF. <strong>Test alternatif :</strong> si AC15 trop chimey, essaye <strong>US BLUES STD</strong> (Bassman) ou <strong>CALI CLEAN SPL</strong> (Tweed Twin 57) avec les mêmes réglages. Joue plus mou et plus près du milieu du corps pour casser la nasalité du chevalet."
   },
   daftpunk: { title: "Get Lucky (solo)", artist: "Daft Punk / Nile Rodgers", genre: "Funk",
     ampModel: "CALI CLEAN", bank: "STD", ampReal: "Fender Pro 6G5-A (clean chaud funk)",
