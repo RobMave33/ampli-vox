@@ -1222,15 +1222,15 @@ const P = {
   },
   johnnybgoode: { title: "Johnny B. Goode (BTTF)", artist: "Chuck Berry / Marty McFly", genre: "Rock'n'Roll",
     ampModel: "UK ROCK", bank: "STD", ampReal: "Marshall JTM45 tweed = copie quasi-exacte du Fender Bassman 4x10 de Chuck Berry (dimed)",
-    gain: 7, volume: 9, treble: 7, middle: 6, bass: 4, master: 5,
-    pedal: "TREBLE BOOST", pedalOn: true, pedalValue: 5, modType: "OFF", modOn: false, modDepth: 0, modSpeed: 0,
-    delayOn: false, delayTime: 0, delayFb: 0, reverb: "SPRING", reverbOn: true, reverbMix: 25,
-    guitar: { pickup: 4, tone: 8, tone2: 8, volume: 9, note: "Marty joue une Gibson ES-345 (semi-hollow + humbuckers) dans un Fender Bassman à fond. Sur ta Strat, position 4 (inter-chevalet) ou 2 (inter-manche) si tu veux plus de rondeur. Tone à 8, volume guitare à 9 — la guitare doit pousser. Attaque ferme au médiator, vers le centre du corps." },
-    guitarNote: "🎯 <strong>Strat ≠ ES-345 humbucker.</strong> Pour t'en rapprocher : <strong>UK ROCK STD (JTM45 tweed) dimed</strong> = même circuit que le Bassman de Chuck Berry. <strong>VOLUME 9 + GAIN 7</strong> font cruncher le préampli naturellement, et <strong>TREBLE BOOST à 5</strong> ajoute le mordant signature. Position 4 + tones 8 + volume guitare 9.",
+    gain: 7, volume: 9, treble: 8, middle: 5, bass: 3, master: 5,
+    pedal: "TREBLE BOOST", pedalOn: true, pedalValue: 5, modType: "TAPE ECHO", modOn: false, modDepth: 0, modSpeed: 0,
+    delayOn: true, delayTime: 100, delayFb: 15, reverb: "SPRING", reverbOn: true, reverbMix: 25,
+    guitar: { pickup: 5, tone: 9, tone2: 9, volume: 9, note: "Marty joue une Gibson ES-345 (semi-hollow + humbuckers) dans un Fender Bassman à fond. Sur ta Strat, micro chevalet (position 5) ou inter-chevalet (4) pour le claquant. Tone à 9 — il faut de la brillance, ton extrait actuel est trop sombre. Volume guitare à 9. Attaque ferme au médiator, vers le chevalet (pas le centre) pour le mordant 50s." },
+    guitarNote: "🎯 <strong>Le son Marty est BRILLANT et CLAQUANT, pas rond.</strong> Position <strong>chevalet (5)</strong> ou inter-chevalet (4), <strong>tones à 9</strong>, attaque près du chevalet. Le slapback delay (~100ms) est essentiel — c'est la signature 50s qui donne le côté vivant. EQ révisée : <strong>TREBLE 8 / MID 5 / BASS 3</strong> pour sortir du voilé et avoir le twang.",
     extPedals: [
       { icon: "🟡", name: "Klon / Boss SD-1 (option crunch +)", desc: "Si l'ampli ne crunche pas assez à ton volume — Klon en mode 'unity gain' juste pour pousser plus fort le préampli sans changer le son.", params: [{ n: "DRIVE", v: 2 }, { n: "TONE", v: 5 }, { n: "LEVEL", v: 8 }], opt: true }
     ],
-    tip: "💡 <strong>Le crunch Chuck Berry / Marty :</strong> c'est un <strong>ampli dimed</strong>, pas une pédale. <strong>UK ROCK STD (JTM45/Bassman) avec VOLUME 9 + GAIN 7 + TREBLE BOOST 5</strong> est ta meilleure approximation sur VT20+. Si toujours pas assez crunch : monte MASTER à 7 pour faire travailler aussi l'étage de puissance. <strong>Variantes à tester :</strong> <strong>US BLUES SPL</strong> (Bruno Cowtipper, plus boutique) ou <strong>US 2x12 SPL</strong> (Matchless DC30, énorme crunch). Si trop saturé : baisse GAIN à 6 et garde VOLUME 9 — le breakup viendra plus du préamp que du gain stage."
+    tip: "💡 <strong>Slapback obligatoire :</strong> active MOD/DELAY en <strong>TAPE ECHO 100ms, feedback bas (~15%)</strong> — c'est la signature 50s rockabilly qui rend le son vivant. <strong>EQ révisée pour sortir du voilé :</strong> TREBLE 8 / MID 5 / BASS 3, micro chevalet (pos 5), tones à 9. <strong>Crunch :</strong> UK ROCK STD dimed avec VOLUME 9 + GAIN 7 + TREBLE BOOST 5 = approximation Bassman/JTM45 de Chuck Berry. Si toujours pas assez crunch : monte MASTER à 7 (étage de puissance). <strong>Variantes à tester :</strong> US BLUES SPL (Bruno Cowtipper) ou US 2x12 SPL (Matchless DC30). Si trop saturé : baisse GAIN à 6, garde VOLUME 9."
   },
   daftpunk: { title: "Get Lucky (solo)", artist: "Daft Punk / Nile Rodgers", genre: "Funk",
     ampModel: "CALI CLEAN", bank: "STD", ampReal: "Fender Pro 6G5-A (clean chaud funk)",
