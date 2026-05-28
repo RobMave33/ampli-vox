@@ -727,7 +727,7 @@ body::before{
   <div class="api-card">
     <div class="api-heading"><span class="dot"></span>Clé API OpenAI</div>
     <div class="api-desc">
-      L'app utilise <strong>GPT-5</strong> (OpenAI) pour analyser n'importe quel morceau et te donner les réglages VOX VT20+ (combo 30W, 11 modèles × 3 banques STD/SPL/CST) adaptés à ta Strat.<br><br>
+      L'app utilise <strong>GPT-5.5</strong> (OpenAI) pour analyser n'importe quel morceau et te donner les réglages VOX VT20+ (combo 30W, 11 modèles × 3 banques STD/SPL/CST) adaptés à ta Strat.<br><br>
       Ta clé reste <strong>uniquement sur cet appareil</strong> (localStorage). Elle n'est jamais envoyée ailleurs qu'à l'API OpenAI.<br><br>
       Obtiens ta clé sur <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com → API Keys</a>.
     </div>
@@ -761,12 +761,12 @@ body::before{
 
 <!-- PAGE MORCEAUX -->
 <div class="page active" id="page-search">
-  <div class="sec-lbl">Recherche GPT-5 — n'importe quel morceau</div>
+  <div class="sec-lbl">Recherche GPT-5.5 — n'importe quel morceau</div>
   <div class="search-row">
     <input class="search-inp" id="aiInp" placeholder="Ex: Sultans of Swing, Texas Flood, Money for Nothing…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
     <button class="go-btn" id="goBtn" onclick="searchSong()">GO</button>
   </div>
-  <div class="loading" id="loadEl"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-5 analyse le son…</span></div>
+  <div class="loading" id="loadEl"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-5.5 analyse le son…</span></div>
   <div class="err-msg" id="errEl"></div>
 
   <div class="sec-lbl" id="libLbl">Ma bibliothèque
@@ -827,7 +827,7 @@ body::before{
     <div class="adj-body">
       <p class="adj-hint">
         Décris ce qui cloche par rapport au son que tu veux — ou colle l'analyse de GPT thinking après avoir comparé ton enregistrement à la vidéo de référence.
-        GPT-5 régénère le preset en intégrant ce feedback.
+        GPT-5.5 régénère le preset en intégrant ce feedback.
       </p>
       <label class="adj-lbl">Feedback / diagnose</label>
       <textarea id="adjFeedback" class="adj-ta" rows="7" placeholder="Ex : le son est trop sombre, il manque le claquant du médiator ; ajouter un slapback delay style 50s ; baisser les basses ; pousser les aigus…"></textarea>
@@ -835,7 +835,7 @@ body::before{
       <input id="adjYt" class="adj-inp" type="text" placeholder="https://www.youtube.com/watch?v=…" />
       <div class="adj-err" id="adjErr"></div>
       <div class="adj-actions">
-        <div class="loading" id="adjLoad"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-5 ajuste le preset…</span></div>
+        <div class="loading" id="adjLoad"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-5.5 ajuste le preset…</span></div>
         <button class="go-btn" id="adjGo" onclick="submitAdjust()">APPLIQUER</button>
       </div>
     </div>
@@ -1626,7 +1626,7 @@ Réponds ensuite UNIQUEMENT avec le JSON final.`;
         "Authorization": "Bearer " + k
       },
       body: JSON.stringify({
-        model: "gpt-5",
+        model: "gpt-5.5",
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: sys },
@@ -1728,7 +1728,7 @@ Renvoie le preset ajusté en JSON complet.`;
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + k },
       body: JSON.stringify({
-        model: "gpt-5",
+        model: "gpt-5.5",
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: sys },
