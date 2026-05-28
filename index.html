@@ -90,14 +90,27 @@ body::before{
 ══════════════════════════════════════ */
 #apiScreen{
   position:fixed;inset:0;background:var(--bg);z-index:200;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:max(32px,env(safe-area-inset-top)) 20px max(32px,env(safe-area-inset-bottom));
-  gap:20px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:max(20px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));
+  gap:16px;overflow-y:auto;-webkit-overflow-scrolling:touch;
   background-image:
     radial-gradient(ellipse 80% 50% at 50% 0%, rgba(240,168,48,.06), transparent 70%),
     radial-gradient(ellipse 80% 50% at 50% 100%, rgba(214,59,59,.04), transparent 70%);
 }
+/* Vertically center when content fits; collapse to top-scroll when it overflows (fixes iPhone clipping) */
+#apiScreen > *:first-child{margin-top:auto;}
+#apiScreen > *:last-child{margin-bottom:auto;}
 #apiScreen.gone{display:none;}
+@media (max-height:720px){
+  .api-logo{width:80px;margin-bottom:0;}
+  .api-brand .vox{font-size:2.1rem;}
+  .api-brand .vt{font-size:1.7rem;}
+  .api-tagline{margin-top:-4px;}
+  .api-card{padding:18px 16px;gap:12px;}
+  .api-desc{font-size:.78rem;line-height:1.55;}
+  .api-desc br + br{display:none;}
+  .api-note{font-size:.65rem;}
+}
 .api-brand{
   display:flex;align-items:baseline;gap:10px;
   font-family:'Bebas Neue',sans-serif;letter-spacing:6px;
