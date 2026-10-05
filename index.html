@@ -367,6 +367,25 @@ body::before{
 }
 .lib-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--panel-2);}
 .lib-btn.danger:hover{border-color:var(--accent-2);color:var(--accent-2);}
+.part-tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.part-tab{
+  background:var(--panel);border:1px solid var(--border);border-radius:5px;
+  padding:7px 12px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  letter-spacing:.8px;cursor:pointer;transition:all .2s;text-transform:uppercase;
+}
+.part-tab:hover{border-color:var(--accent-line);color:var(--text);}
+.part-tab.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+.part-hint{font-size:.74rem;color:#c0bfb9;line-height:1.6;margin-top:8px;}
+.part-hint strong{color:var(--accent);}
+.profile-box{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.72rem;color:#c0bfb9;line-height:1.5;}
+.profile-box > span{flex:1;min-width:180px;}
+.profile-box strong{color:var(--accent);}
+.profile-list{flex-basis:100%;display:flex;flex-direction:column;gap:6px;}
+.profile-item{display:flex;gap:8px;align-items:flex-start;background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:8px 10px;}
+.profile-item div{flex:1;min-width:0;overflow-wrap:anywhere;}
+.profile-item small{display:block;font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--muted-2);letter-spacing:.3px;margin-bottom:3px;}
+.profile-item button{background:none;border:none;color:var(--muted-2);cursor:pointer;font-size:.8rem;padding:0 2px;}
+.profile-item button:hover{color:var(--accent-2);}
 .lib-hint{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--muted-2);letter-spacing:.3px;flex:1;min-width:160px;}
 
 /* ══════════════════════════════════════
@@ -505,7 +524,8 @@ body::before{
   transition:all .2s;
 }
 .pu-btn.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);box-shadow:0 0 12px rgba(240,168,48,.25);}
-.pu-btn span{font-size:.46rem;opacity:.7;}
+.pu-btn span{font-size:.46rem;opacity:.8;}
+@media (max-width:420px){.pu-btn{font-size:.48rem;letter-spacing:0;}}
 
 .gknob-g{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:58px;}
 .gk-lbl{font-family:'JetBrains Mono',monospace;font-size:.54rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;text-align:center;}
@@ -746,7 +766,7 @@ body::before{
   <div class="api-card">
     <div class="api-heading"><span class="dot"></span>Clé API OpenAI</div>
     <div class="api-desc">
-      L'app utilise <strong>GPT-5.5</strong> (OpenAI) pour analyser n'importe quel morceau et te donner les réglages VOX VT20+ (combo 30W, 11 modèles × 3 banques STD/SPL/CST) adaptés à ta Strat.<br><br>
+      L'app utilise <strong>GPT-6.1 Sol</strong> + recherche web (OpenAI) pour analyser n'importe quel morceau et te donner les réglages VOX VT20+ (combo 30W, 11 modèles × 3 banques STD/SPL/CST) adaptés à ta Strat.<br><br>
       Ta clé reste <strong>uniquement sur cet appareil</strong> (localStorage). Elle n'est jamais envoyée ailleurs qu'à l'API OpenAI.<br><br>
       Obtiens ta clé sur <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com → API Keys</a>.
     </div>
@@ -780,12 +800,12 @@ body::before{
 
 <!-- PAGE MORCEAUX -->
 <div class="page active" id="page-search">
-  <div class="sec-lbl">Recherche GPT-5.5 — n'importe quel morceau</div>
+  <div class="sec-lbl">Recherche GPT-6.1 Sol — n'importe quel morceau</div>
   <div class="search-row">
     <input class="search-inp" id="aiInp" placeholder="Ex: Sultans of Swing, Texas Flood, Money for Nothing…" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
     <button class="go-btn" id="goBtn" onclick="searchSong()">GO</button>
   </div>
-  <div class="loading" id="loadEl"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-5.5 analyse le son…</span></div>
+  <div class="loading" id="loadEl"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-6.1 Sol recherche le matos et analyse le son… (30 s à 2 min)</span></div>
   <div class="err-msg" id="errEl"></div>
 
   <div class="sec-lbl" id="libLbl">Ma bibliothèque
@@ -797,6 +817,12 @@ body::before{
     <input type="file" id="libFile" accept="application/json,.json" style="display:none" onchange="importLib(event)"/>
     <button class="lib-btn danger" onclick="clearLib()" title="Vider la bibliothèque">✕ Vider</button>
     <span class="lib-hint">Les morceaux recherchés restent sur ton appareil — exporte pour sauvegarde.</span>
+  </div>
+  <div class="profile-box" id="profileBox" style="display:none">
+    <span>🧠 <strong>Profil d'écoute :</strong> <span id="profileCount"></span> — l'IA s'en sert pour calibrer chaque nouveau preset sur ton ampli.</span>
+    <button class="lib-btn" onclick="toggleProfile()" id="profileToggle">Voir</button>
+    <button class="lib-btn danger" onclick="clearProfile()">Oublier</button>
+    <div class="profile-list" id="profileList" style="display:none"></div>
   </div>
   <div class="sec-lbl">Morceaux préréglés</div>
   <div class="song-grid" id="songGrid"></div>
@@ -812,6 +838,10 @@ body::before{
     <div class="song-hdr">
       <div class="song-big" id="dTitle">—</div>
       <div class="song-by" id="dArtist">—</div>
+    </div>
+    <div id="partSec" style="display:none">
+      <div class="part-tabs" id="partTabs"></div>
+      <div class="part-hint" id="partHint"></div>
     </div>
     <div class="adapt-note" id="adaptNote"></div>
     <div class="procedure" id="procedure"></div>
@@ -846,7 +876,7 @@ body::before{
     <div class="adj-body">
       <p class="adj-hint">
         Décris ce qui cloche par rapport au son que tu veux — ou colle l'analyse de GPT thinking après avoir comparé ton enregistrement à la vidéo de référence.
-        GPT-5.5 régénère le preset en intégrant ce feedback.
+        GPT-6.1 Sol régénère le preset en intégrant ce feedback.
       </p>
       <label class="adj-lbl">Feedback / diagnose</label>
       <textarea id="adjFeedback" class="adj-ta" rows="7" placeholder="Ex : le son est trop sombre, il manque le claquant du médiator ; ajouter un slapback delay style 50s ; baisser les basses ; pousser les aigus…"></textarea>
@@ -854,7 +884,7 @@ body::before{
       <input id="adjYt" class="adj-inp" type="text" placeholder="https://www.youtube.com/watch?v=…" />
       <div class="adj-err" id="adjErr"></div>
       <div class="adj-actions">
-        <div class="loading" id="adjLoad"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-5.5 ajuste le preset…</span></div>
+        <div class="loading" id="adjLoad"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span>GPT-6.1 Sol ajuste le preset…</span></div>
         <button class="go-btn" id="adjGo" onclick="submitAdjust()">APPLIQUER</button>
       </div>
     </div>
@@ -867,7 +897,16 @@ body::before{
 
 <script>
 /* ── GUITAR PROFILE ───────────────────────────────── */
-const GUITAR_CTX = "La guitare du joueur est une Fender American Special Stratocaster avec micros single-coil Texas Special et médiator épais/rigide. Points clés : micros single-coil brillants et précis, attaque définie avec médiator épais, son naturellement clair avec beaucoup de présence dans les hauts médiums. Avec fort gain les single-coils captent des parasites — recommande un noise gate si besoin. Adapte le TREBLE (baisser vs humbucker), précise le choix de micro (position 1=manche, 2=inter manche, 3=milieu, 4=inter chevalet, 5=chevalet), et le réglage Tone/Volume de la guitare.";
+const GUITAR_CTX = `═══ GUITARE DU JOUEUR (fiche Fender officielle) ═══
+Fender American Special Stratocaster (USA, réf. 0115602309) — médiator épais/rigide.
+• Corps aulne, manche érable « Modern C », touche érable radius 9.5", frettes jumbo, diapason 25.5", sillet os synthétique. Aulne + touche érable = son brillant, claquant, attaque nette.
+• 3 micros Custom Shop Texas Special single-coil (SSS) : plus de sortie et plus de médiums que des single-coils vintage, toujours brillants et précis. Avec fort gain, les single-coils captent des parasites → recommande un noise gate si besoin.
+• Cordes d'origine Fender 250L .009-.042 (tirant léger) : moins de grave et de sortie que les tirants lourds (ex. SRV en .013) → compense par le MIDDLE/GAIN ampli plutôt qu'en montant BASS.
+• Chevalet trémolo vintage synchronisé 6 pontets.
+• COMMANDES (attention, différent d'une Strat classique) : 1 Volume général · TONE 1 = micro MANCHE · TONE 2 = micro CHEVALET. Le micro MILIEU n'a AUCUN tone (toujours plein aigus).
+• Les deux tones sont des circuits GREASEBUCKET : ils coupent les aigus SANS ajouter de grave/boue. On peut donc descendre un tone à 5-7 pour adoucir sans que le son devienne sourd. Le TONE 2 permet d'adoucir le micro chevalet (impossible sur une Strat classique) → arme principale contre le chevalet trop strident/nasal.
+• Sélecteur 5 positions. Dans le JSON, "pickup" : 1=manche, 2=manche+milieu, 3=milieu, 4=milieu+chevalet, 5=chevalet. ATTENTION : la fiche Fender numérote à l'envers (position 1 = chevalet). Donc dans TOUS les textes (notes, tip, switchHint), nomme TOUJOURS le micro en toutes lettres (« micro chevalet », « manche + milieu »…), jamais un numéro de position seul.
+• Adapte le TREBLE (baisser vs humbucker), précise le choix de micro, le volume guitare, TONE 1 et TONE 2.`;
 
 /* ── STORAGE ──────────────────────────────────────── */
 const KEY_LS = 'vox_openai_key';
@@ -973,6 +1012,7 @@ const getPlayMode = () => { try { return localStorage.getItem(MODE_LS) || 'appar
 const setPlayModeLS = id => { try { localStorage.setItem(MODE_LS, id); } catch {} };
 let currentDisplay = null;
 let currentSource = null; /* {type:'factory'|'custom', key?:string, index?:number} */
+let currentPart = 0; /* 0 = partie principale, 1..n = currentDisplay.parts[n-1] */
 function changePlayMode(id) {
   const mode = POWER_MODES.find(m => m.id === id);
   if (!mode) return;
@@ -981,7 +1021,7 @@ function changePlayMode(id) {
   if (currentDisplay) {
     const page = document.getElementById('page-amp');
     const savedScroll = page ? page.scrollTop : 0;
-    render(currentDisplay, { keepScroll: true });
+    render(currentDisplay, { keepScroll: true, part: currentPart });
     if (page) page.scrollTop = savedScroll;
   }
 }
@@ -1219,9 +1259,9 @@ function buildPanel(d) {
 }
 
 /* ── PICKUP SWITCH ────────────────────────────────── */
-const PU_SHORT = ['M', 'IM', 'Ø', 'IC', 'C'];
+const PU_LABELS = [['MANCHE', ''], ['MANCHE', '+ MILIEU'], ['MILIEU', ''], ['MILIEU', '+ CHEV.'], ['CHEVALET', '']];
 function pickupHtml(pos) {
-  return PU_SHORT.map((l, i) => `<div class="pu-btn${i + 1 === pos ? ' active' : ''}">${i + 1}<span>${l}</span></div>`).join('');
+  return PU_LABELS.map(([a, b], i) => `<div class="pu-btn${i + 1 === pos ? ' active' : ''}">${a}${b ? `<span>${b}</span>` : ''}</div>`).join('');
 }
 
 /* ── PRESETS ──────────────────────────────────────── */
@@ -1244,8 +1284,8 @@ const P = {
     gain: 6, volume: 7, treble: 7, middle: 7, bass: 5, master: 7,
     pedal: "TUBE OD", pedalOn: false, modType: "OFF", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: false, delayTime: 0, delayFb: 0, reverb: "SPRING", reverbOn: true, reverbMix: 15,
-    guitar: { pickup: 5, tone: 8, volume: 10, note: "Micro chevalet (position 5) pour la mordant et l'agressivité du hard rock. Tone ouvert." },
-    guitarNote: "Micro <strong>chevalet</strong> (position 5) pour la mordant brit typique. Ta Strat avec médiator épais donnera un picking précis et défini — parfait pour les riffs d'Angus.",
+    guitar: { pickup: 5, tone: 8, volume: 10, note: "Micro chevalet pour la mordant et l'agressivité du hard rock. Tone ouvert." },
+    guitarNote: "Micro <strong>chevalet</strong> pour la mordant brit typique. Ta Strat avec médiator épais donnera un picking précis et défini — parfait pour les riffs d'Angus.",
     extPedals: [
       { icon: "🟡", name: "Ibanez Tube Screamer TS-9", desc: "Drive minimal, Level fort — pousse les lampes naturellement", params: [{ n: "DRIVE", v: 2 }, { n: "TONE", v: 5 }, { n: "LEVEL", v: 7 }], opt: true }
     ],
@@ -1284,7 +1324,7 @@ const P = {
     pedal: "COMP", pedalOn: true, modType: "FLANGER", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: true, delayTime: 440, delayFb: 40, reverb: "HALL", reverbOn: true, reverbMix: 40,
     guitar: { pickup: 1, tone: 6, volume: 9, note: "Gilmour jouait en Strat comme toi ! Micro manche pour les solos — plus chaud et plus de sustain. Tone légèrement réduit pour la douceur." },
-    guitarNote: "🎯 <strong>David Gilmour jouait en Strat !</strong> Micro <strong>manche</strong> (position 1) pour les solos — chaud et plein. Tone à 6 pour compenser la brillance naturelle des Texas Special.",
+    guitarNote: "🎯 <strong>David Gilmour jouait en Strat !</strong> Micro <strong>manche</strong> pour les solos — chaud et plein. Tone à 6 pour compenser la brillance naturelle des Texas Special.",
     extPedals: [
       { icon: "🟠", name: "EHX Big Muff Pi", desc: "Sustain chaud et long — son signature de Gilmour", params: [{ n: "SUST", v: 7 }, { n: "TONE", v: 4 }, { n: "VOL", v: 6 }], opt: false },
       { icon: "🔵", name: "MXR Phase 90", desc: "Pour les parties rythmiques entre les solos", params: [{ n: "SPEED", v: 2 }], opt: true }
@@ -1296,8 +1336,8 @@ const P = {
     gain: 5, volume: 8, treble: 6, middle: 7, bass: 6, master: 7,
     pedal: "TUBE OD", pedalOn: true, modType: "TWIN TREM", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: false, delayTime: 0, delayFb: 0, reverb: "SPRING", reverbOn: true, reverbMix: 25,
-    guitar: { pickup: 4, tone: 8, volume: 10, note: "SRV jouait en Strat avec les Texas Special — exactement ta guitare ! Position inter-chevalet (4) pour son son légendaire. Il accordait en Eb avec des .013." },
-    guitarNote: "🎯 <strong>SRV jouait en Strat avec Texas Special — comme toi !</strong> C'est le preset le plus fidèle à ta guitare. Position inter-chevalet (4). Il accordait en Eb (demi-ton en dessous) avec des cordes .013.",
+    guitar: { pickup: 4, tone: 8, volume: 10, note: "SRV jouait en Strat avec les Texas Special — exactement ta guitare ! Position milieu + chevalet pour son son légendaire. Il accordait en Eb avec des .013." },
+    guitarNote: "🎯 <strong>SRV jouait en Strat avec Texas Special — comme toi !</strong> C'est le preset le plus fidèle à ta guitare. Position milieu + chevalet. Il accordait en Eb (demi-ton en dessous) avec des cordes .013.",
     extPedals: [
       { icon: "🟡", name: "Ibanez Tube Screamer TS-808", desc: "L'overdrive signature de SRV — Level fort pour pousser l'ampli", params: [{ n: "DRIVE", v: 4 }, { n: "TONE", v: 5 }, { n: "LEVEL", v: 7 }], opt: false }
     ],
@@ -1320,24 +1360,24 @@ const P = {
     gain: 7, volume: 9, treble: 8, middle: 5, bass: 3, master: 5,
     pedal: "TREBLE BOOST", pedalOn: true, pedalValue: 5, modType: "TAPE ECHO", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: true, delayTime: 100, delayFb: 15, reverb: "SPRING", reverbOn: true, reverbMix: 25,
-    guitar: { pickup: 5, tone: 9, tone2: 9, volume: 9, note: "Marty joue une Gibson ES-345 (semi-hollow + humbuckers) dans un Fender Bassman à fond. Sur ta Strat, micro chevalet (position 5) ou inter-chevalet (4) pour le claquant. Tone à 9 — il faut de la brillance, ton extrait actuel est trop sombre. Volume guitare à 9. Attaque ferme au médiator, vers le chevalet (pas le centre) pour le mordant 50s." },
-    guitarNote: "🎯 <strong>Le son Marty est BRILLANT et CLAQUANT, pas rond.</strong> Position <strong>chevalet (5)</strong> ou inter-chevalet (4), <strong>tones à 9</strong>, attaque près du chevalet. Le slapback delay (~100ms) est essentiel — c'est la signature 50s qui donne le côté vivant. EQ révisée : <strong>TREBLE 8 / MID 5 / BASS 3</strong> pour sortir du voilé et avoir le twang.",
+    guitar: { pickup: 5, tone: 9, tone2: 9, volume: 9, note: "Marty joue une Gibson ES-345 (semi-hollow + humbuckers) dans un Fender Bassman à fond. Sur ta Strat, micro chevalet ou milieu + chevalet pour le claquant. Tone à 9 — il faut de la brillance, ton extrait actuel est trop sombre. Volume guitare à 9. Attaque ferme au médiator, vers le chevalet (pas le centre) pour le mordant 50s." },
+    guitarNote: "🎯 <strong>Le son Marty est BRILLANT et CLAQUANT, pas rond.</strong> Position <strong>chevalet</strong> ou milieu + chevalet, <strong>tones à 9</strong>, attaque près du chevalet. Le slapback delay (~100ms) est essentiel — c'est la signature 50s qui donne le côté vivant. EQ révisée : <strong>TREBLE 8 / MID 5 / BASS 3</strong> pour sortir du voilé et avoir le twang.",
     extPedals: [
       { icon: "🟡", name: "Klon / Boss SD-1 (option crunch +)", desc: "Si l'ampli ne crunche pas assez à ton volume — Klon en mode 'unity gain' juste pour pousser plus fort le préampli sans changer le son.", params: [{ n: "DRIVE", v: 2 }, { n: "TONE", v: 5 }, { n: "LEVEL", v: 8 }], opt: true }
     ],
-    tip: "💡 <strong>Slapback obligatoire :</strong> active MOD/DELAY en <strong>TAPE ECHO 100ms, feedback bas (~15%)</strong> — c'est la signature 50s rockabilly qui rend le son vivant. <strong>EQ révisée pour sortir du voilé :</strong> TREBLE 8 / MID 5 / BASS 3, micro chevalet (pos 5), tones à 9. <strong>Crunch :</strong> UK ROCK STD dimed avec VOLUME 9 + GAIN 7 + TREBLE BOOST 5 = approximation Bassman/JTM45 de Chuck Berry. Si toujours pas assez crunch : monte MASTER à 7 (étage de puissance). <strong>Variantes à tester :</strong> US BLUES SPL (Bruno Cowtipper) ou US 2x12 SPL (Matchless DC30). Si trop saturé : baisse GAIN à 6, garde VOLUME 9."
+    tip: "💡 <strong>Slapback obligatoire :</strong> active MOD/DELAY en <strong>TAPE ECHO 100ms, feedback bas (~15%)</strong> — c'est la signature 50s rockabilly qui rend le son vivant. <strong>EQ révisée pour sortir du voilé :</strong> TREBLE 8 / MID 5 / BASS 3, micro chevalet, tones à 9. <strong>Crunch :</strong> UK ROCK STD dimed avec VOLUME 9 + GAIN 7 + TREBLE BOOST 5 = approximation Bassman/JTM45 de Chuck Berry. Si toujours pas assez crunch : monte MASTER à 7 (étage de puissance). <strong>Variantes à tester :</strong> US BLUES SPL (Bruno Cowtipper) ou US 2x12 SPL (Matchless DC30). Si trop saturé : baisse GAIN à 6, garde VOLUME 9."
   },
   daftpunk: { title: "Get Lucky (solo)", artist: "Daft Punk / Nile Rodgers", genre: "Funk",
     ampModel: "CALI CLEAN", bank: "STD", ampReal: "Fender Pro 6G5-A (clean chaud funk)",
     gain: 2, volume: 7, treble: 6, middle: 5, bass: 4, master: 6,
     pedal: "COMP", pedalOn: true, modType: "OFF", modOn: false, modDepth: 0, modSpeed: 0,
     delayOn: false, delayTime: 0, delayFb: 0, reverb: "ROOM", reverbOn: true, reverbMix: 20,
-    guitar: { pickup: 4, tone: 8, volume: 8, note: "Nile Rodgers jouait en Strat comme toi ! Position inter-chevalet (4) pour le son quacky funk typique. Volume légèrement réduit pour le picking précis." },
-    guitarNote: "🎯 <strong>Nile Rodgers joue en Strat — comme toi !</strong> Position <strong>inter-chevalet (4)</strong> pour le son quacky funk. Ton médiator épais est parfait pour les cuts rythmiques précis.",
+    guitar: { pickup: 4, tone: 8, volume: 8, note: "Nile Rodgers jouait en Strat comme toi ! Position milieu + chevalet pour le son quacky funk typique. Volume légèrement réduit pour le picking précis." },
+    guitarNote: "🎯 <strong>Nile Rodgers joue en Strat — comme toi !</strong> Position <strong>milieu + chevalet</strong> pour le son quacky funk. Ton médiator épais est parfait pour les cuts rythmiques précis.",
     extPedals: [
       { icon: "🟡", name: "Boss CS-3 Compressor", desc: "Attack claquée et percussive — son funk signature de Nile Rodgers", params: [{ n: "ATK", v: 2 }, { n: "SUST", v: 5 }, { n: "LEVEL", v: 7 }], opt: false }
     ],
-    tip: "💡 <strong>Nile Rodgers joue en Strat comme toi !</strong> Position 4 (inter-chevalet) pour le son quacky. Son totalement clean, COMP actif. Joue avec des cuts (étouffés) entre les accords pour le groove funk. TREBLE à 6, les Texas Special sont déjà brillants."
+    tip: "💡 <strong>Nile Rodgers joue en Strat comme toi !</strong> Position milieu + chevalet pour le son quacky. Son totalement clean, COMP actif. Joue avec des cuts (étouffés) entre les accords pour le groove funk. TREBLE à 6, les Texas Special sont déjà brillants."
   }
 };
 
@@ -1371,6 +1411,7 @@ function renderGrid() {
     </div>`;
   }).join('');
   grid.innerHTML = customHtml + presetHtml;
+  renderProfile();
   grid.querySelectorAll('.song-item').forEach(el => {
     el.addEventListener('click', (ev) => {
       if (ev.target.classList.contains('si-del')) return;
@@ -1538,13 +1579,61 @@ function validatePreset(p) {
           ...(typeof pp.label === 'string' ? { label: pp.label } : {})
         })) : []
     })) : [];
+  p.partName = (typeof p.partName === 'string' && p.partName.trim()) ? p.partName.trim().slice(0, 40) : '';
+  p.parts = Array.isArray(p.parts) ? p.parts.slice(0, 2).map((x, i) => validatePart(p, x, i)).filter(Boolean) : [];
   return p;
+}
+/* Une partie ne contient que ce qui change : on la fusionne avec la partie principale
+   puis on stocke le réglage complet (plus simple à afficher et à renvoyer à l'IA). */
+const PART_FIELDS = ['ampModel','bank','ampReal','factoryPreset','gain','volume','treble','middle','bass','master','pedal','pedalOn','pedalValue','modType','modOn','modDepth','modSpeed','delayOn','delayTime','delayFb','reverb','reverbOn','reverbMix','guitar','guitarNote','tip'];
+const PART_AMP_KEYS = ['ampModel','bank','gain','volume','treble','middle','bass','master','pedal','pedalOn','pedalValue','modType','modOn','modDepth','modSpeed','delayOn','delayTime','delayFb','reverb','reverbOn','reverbMix'];
+function validatePart(main, x, i) {
+  if (!x || typeof x !== 'object') return null;
+  const xg = (x.guitar && typeof x.guitar === 'object') ? x.guitar : {};
+  const m = validatePreset({
+    ...main, ...x, title: main.title, parts: [], extPedals: [],
+    ampModel: AMP_MODELS.includes(x.ampModel) ? x.ampModel : main.ampModel,
+    guitar: { ...main.guitar, ...xg }
+  });
+  if (!m) return null;
+  if (PART_AMP_KEYS.some(k => m[k] !== main[k])) m.factoryPreset = false;
+  const part = {
+    name: (typeof x.name === 'string' && x.name.trim()) ? x.name.trim().slice(0, 40) : `Partie ${i + 2}`,
+    switchHint: typeof x.switchHint === 'string' ? x.switchHint : ''
+  };
+  PART_FIELDS.forEach(k => { part[k] = m[k]; });
+  return part;
+}
+const partList = d => (d && Array.isArray(d.parts)) ? d.parts : [];
+const partView = (d, i) => (i > 0 && partList(d)[i - 1]) ? { ...d, ...partList(d)[i - 1] } : d;
+const partLabel = (d, i) => (i > 0 && partList(d)[i - 1]) ? partList(d)[i - 1].name : ((d && d.partName) || 'Principal');
+function showPart(i) {
+  const page = document.getElementById('page-amp');
+  const savedScroll = page ? page.scrollTop : 0;
+  render(currentDisplay, { keepScroll: true, part: i });
+  if (page) page.scrollTop = savedScroll;
 }
 
 /* ── RENDER ───────────────────────────────────────── */
-function render(d, opts) {
+function render(full, opts) {
   opts = opts || {};
-  currentDisplay = d;
+  currentDisplay = full;
+  const parts = partList(full);
+  currentPart = (Number.isInteger(opts.part) && opts.part >= 0 && opts.part <= parts.length) ? opts.part : 0;
+  const d = partView(full, currentPart);
+  const partSec = document.getElementById('partSec');
+  if (parts.length) {
+    document.getElementById('partTabs').innerHTML = [0, ...parts.map((_, i) => i + 1)].map(i =>
+      `<button class="part-tab${i === currentPart ? ' active' : ''}" onclick="showPart(${i})">${escapeHtml(partLabel(full, i))}</button>`
+    ).join('');
+    const hint = currentPart > 0 ? d.switchHint : '';
+    const ph = document.getElementById('partHint');
+    ph.innerHTML = hint ? '🔀 <strong>Pour passer à cette partie :</strong> ' + safeHtml(hint) : '';
+    ph.style.display = hint ? 'block' : 'none';
+    partSec.style.display = 'block';
+  } else {
+    partSec.style.display = 'none';
+  }
   document.getElementById('ph').style.display = 'none';
   const ad = document.getElementById('ad');
   ad.style.display = 'flex';
@@ -1615,7 +1704,7 @@ function render(d, opts) {
   ghtml += `<div style="display:flex;gap:12px;flex-wrap:wrap;">
     <div class="gknob-g">${kSvg(g.volume, 54)}<div class="gk-lbl">VOLUME</div><div class="gk-val">${g.volume}</div></div>
     <div class="gknob-g">${kSvg(g.tone, 54)}<div class="gk-lbl">TONE 1<br><span style="font-size:.45rem;opacity:.7">MANCHE</span></div><div class="gk-val">${g.tone}</div></div>
-    <div class="gknob-g">${kSvg(tone2, 54)}<div class="gk-lbl">TONE 2<br><span style="font-size:.45rem;opacity:.7">MILIEU</span></div><div class="gk-val">${tone2}</div></div>
+    <div class="gknob-g">${kSvg(tone2, 54)}<div class="gk-lbl">TONE 2<br><span style="font-size:.45rem;opacity:.7">CHEVALET</span></div><div class="gk-val">${tone2}</div></div>
   </div>`;
   ghtml += `<div class="guitar-note-txt">${safeHtml(g.note)}</div>`;
   gc.innerHTML = ghtml;
@@ -1645,19 +1734,8 @@ function switchTab(id, btn) {
   document.getElementById('page-' + id).classList.add('active');
 }
 
-/* ── OPENAI SEARCH ────────────────────────────────── */
-async function searchSong() {
-  const inp = document.getElementById('aiInp'), q = inp.value.trim();
-  if (!q) return;
-  const k = getKey();
-  if (!k) { showErr('Clé OpenAI manquante.'); return; }
-  const btn = document.getElementById('goBtn'), loadEl = document.getElementById('loadEl'), errEl = document.getElementById('errEl');
-  btn.disabled = true; loadEl.classList.add('on'); errEl.classList.remove('on');
-
-  const sys = `Tu es un expert en son de guitare et en amplificateur VOX VT20+ (combo 30W, HP 8", lampe 12AX7 Valve Reactor).
-${GUITAR_CTX}
-
-═══ CONTEXTE D'UTILISATION (obligatoire à respecter) ═══
+/* Contexte VT20+ partagé par la recherche ET l'ajustement (même connaissance des deux côtés) */
+const VT20_CTX = `═══ CONTEXTE D'UTILISATION (obligatoire à respecter) ═══
 Le joueur utilise son VT20+ EN APPARTEMENT en priorité (~3W), mais doit pouvoir transposer ses réglages à volume répèt/concert SANS changer le caractère du son. Conclusion pratique :
 • Le VT20+ a un POWER LEVEL physique (POTARD CONTINU MIN → 30W) qui est un ATTÉNUATEUR de l'étage de puissance — il change uniquement le volume sortant, PAS le timbre. Repères : 1-5W = appart, 5-12W = chambre / volume conversationnel, 12-22W = répèt, 22-30W = concert.
 • Conséquence : tu peux pousser GAIN/VOLUME/MASTER pour faire saturer le préamp ET l'étage de puissance, et le joueur restera audible chez lui en POWER LEVEL bas. Ne sous-dimensionne PAS le crunch par peur du volume.
@@ -1677,31 +1755,16 @@ NR SENS n'est PAS un bouton ON/OFF — c'est un seuil 0-10 (accédé via HOLD du
 La Strat à single-coils Texas Special est physiquement différente des guitares de référence courantes. Considère ces principes — ils ne sont PAS des règles absolues, à toi de juger ce qui sert le morceau :
 
 • Les Texas Special ont déjà beaucoup de hauts-médiums. Si tu baisses TREBLE sous 5, vérifie que ce n'est pas pour compenser une brillance qui n'existe pas — résultat probable : son honky/nasal.
-• Pour reproduire la chaleur d'un humbucker sur une Strat, deux leviers : pousser le MIDDLE ampli (6-8), et changer de position de micro (4 = inter-chevalet ou 2 = inter-manche). Le bridge seul (pos 5) reste nasal.
+• Pour reproduire la chaleur d'un humbucker sur une Strat, deux leviers : pousser le MIDDLE ampli (6-8), et changer de position de micro (milieu+chevalet ou manche+milieu). Le chevalet seul reste nasal/strident à TONE 2 sur 10 → descends TONE 2 vers 6-7 (Greasebucket : adoucit sans boue) pour un chevalet plus gras.
 • Le HP 8" du VT20+ devient mou au-dessus de BASS 5. Pour les chansons à grosse assise, préfère compenser via le TONE neck de la guitare ou le VOLUME, plutôt qu'en montant BASS.
 • Pour les sons d'époque où l'ampli est joué dimed (Chuck Berry, AC/DC, Stones, Hendrix clean, blues 60s/70s), le crunch vient du préampli poussé : GAIN modéré-haut, VOLUME haut, MASTER en accord. Une OD par-dessus un clean ne sonne pas pareil — souvent plus synthétique. À doser.
 • Inversement, pour les sons modernes high-gain (metal moderne, djent, prog), préamp VT20+ propre + OD/Distortion pour le grain est la bonne approche.
-• Position de micro = stratégie principale d'adaptation : 5 (bridge) pour le mordant/P90, 4 pour le quack rock/funk, 3 (milieu) pour le clean transparent, 2 pour humbucker simulé, 1 (manche) pour les solos chaleureux.
+• Position de micro = stratégie principale d'adaptation : chevalet pour le mordant/P90, milieu+chevalet pour le quack rock/funk, milieu pour le clean transparent (sans tone possible), manche+milieu pour humbucker simulé, manche pour les solos chaleureux.
+• Les tones Greasebucket sont un vrai outil de réglage : TONE 1 (manche) pour un solo « woman tone » ou jazzy, TONE 2 (chevalet) pour arrondir le chevalet en crunch/saturé. Ne laisse pas systématiquement les tones à 10.
 • Single-coils + GAIN > 7 = parasites importants. Recommande NR SENS (ex: 5) ou un NS-2 dans extPedals.
 • Médiator épais = attaque accentuée. Pour les morceaux legato/doux, précise dans la note guitare de jouer plus mou ou plus près du manche.
 
 ═══ FIN DES PRINCIPES ═══
-
-═══ EXEMPLES (few-shot, pour calibrer ton raisonnement) ═══
-
-EXEMPLE 1 — entrée : "Back in Black, AC/DC"
-Raisonnement (NE PAS METTRE DANS LA RÉPONSE) : Ce morceau est DANS la liste des 33 SONG presets factory du VT20+ → US 2x12 CST (LED bank rouge). Donc factoryPreset=true. Le VT20+ charge ses propres GAIN/VOLUME/EQ — j'indique quand même des valeurs cohérentes comme garde-fou si l'utilisateur passe en MANUAL. Angus Young joue SG/humbucker, pour Strat compenser : MIDDLE haut, position 4 ou 5.
-Sortie correcte : ampModel="US 2x12", bank="CST", factoryPreset=true, ampReal="Fender Twin actif crunch modifié (preset factory VT20+ Back In Black)", gain≈6, volume≈7, treble≈7, middle≈7, bass≈5, master≈7, pedal="OFF", modOn=false, reverb="SPRING" mix 15-20, pickup=5, tones=8, volume guitare=10, powerLevel=3.
-
-EXEMPLE 2 — entrée : "Enter Sandman, Metallica"
-Raisonnement : Morceau dans la liste factory → UK METAL STD (LED bank vert). factoryPreset=true. Hetfield joue ESP humbucker → pour Strat NS-2 recommandé, MIDDLE bas (scooped), TREBLE haut.
-Sortie correcte : ampModel="UK METAL", bank="STD", factoryPreset=true, ampReal="Marshall JCM2000 100W (preset factory VT20+ Enter Sandman)", gain≈8, volume≈5, treble≈7, middle≈3, bass≈6, master≈6, pedal="TUBE OD" pedalOn=true VALUE 7, modOn=false, reverb="ROOM" mix 10, pickup=5, tones=10, volume guitare=10, NR SENS 6, NS-2 dans extPedals, powerLevel=3.
-
-EXEMPLE 3 (HORS LISTE FACTORY) — entrée : "Wish You Were Here, Pink Floyd"
-Raisonnement : N'est PAS dans les 33 SONG presets factory. factoryPreset=false → mode MANUAL. Gilmour joue Strat en clean breakup avec léger crunch, son aérien. UK ROCK STD (JTM45 tweed) ou VOX AC30 STD selon goût.
-Sortie correcte : ampModel="UK ROCK", bank="STD", factoryPreset=false, gain≈4, volume≈6, treble≈6, middle≈5, bass≈5, master≈6, reverb="HALL" mix 30, pickup=1 (manche pour solo), tones=7, powerLevel=3.
-
-═══ FIN DES EXEMPLES ═══
 
 IMPORTANT : utilise UNIQUEMENT les modèles d'ampli réellement présents sur le VT20+. Chaque modèle a 3 banques (STD/SPL/CST) sélectionnables avec le bouton AMP (vert/orange/rouge).
 
@@ -1766,14 +1829,21 @@ RÈGLE DE MATCH FACTORY :
 • Sinon factoryPreset=false.
 • Garde toujours les valeurs GAIN/VOLUME/EQ cohérentes même si factoryPreset=true (utile en mode manuel de secours).
 
-Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans \`\`\`, sans texte avant ou après. Structure exacte :
-{"title":"Nom","artist":"Artiste","genre":"Genre court","ampModel":"CLEAN|CALI CLEAN|US BLUES|US 2x12|VOX AC15|VOX AC30|UK ROCK|UK METAL|US HIGH GAIN|US METAL|BOUTIQUE METAL","bank":"STD|SPL|CST","ampReal":"vrai ampli original modélisé","factoryPreset":false,"gain":5,"volume":6,"treble":5,"middle":5,"bass":5,"master":6,"pedal":"OFF|COMP|ACOUSTIC|AUTO WAH|U-VIBE|BRN OCTAVE|TREBLE BOOST|TUBE OD|GOLD DRIVE|ORG DIST|METAL DIST|FUZZ","pedalOn":false,"pedalValue":5,"modType":"OFF|CE CHORUS|MULTI CHORUS|FLANGER|ORG PHASE|TWIN TREM|G4 ROTARY|PITCH SHIFT|FILTRON|TAPE ECHO|DELAY|CHORUS+DELAY","modOn":false,"modDepth":0,"modSpeed":0,"delayOn":false,"delayTime":300,"delayFb":30,"reverb":"OFF|ROOM|SPRING|HALL","reverbOn":false,"reverbMix":20,"powerLevel":3,"guitar":{"pickup":4,"tone":7,"tone2":7,"volume":10,"note":"note courte réglages guitare Strat — tone=micro manche, tone2=micro milieu (chevalet n'a pas de tone sur Strat)"},"guitarNote":"note courte adaptée Strat single-coil Texas Special","extPedals":[{"icon":"emoji","name":"nom pédale","desc":"description","params":[{"n":"NOM","v":5}],"opt":false}],"tip":"💡 <strong>Strat + médiator épais :</strong> conseil pratique"}
+═══ FORMAT JSON DU PRESET ═══
+Structure exacte :
+{"title":"Nom","artist":"Artiste","genre":"Genre court","ampModel":"CLEAN|CALI CLEAN|US BLUES|US 2x12|VOX AC15|VOX AC30|UK ROCK|UK METAL|US HIGH GAIN|US METAL|BOUTIQUE METAL","bank":"STD|SPL|CST","ampReal":"vrai ampli original modélisé","factoryPreset":false,"gain":5,"volume":6,"treble":5,"middle":5,"bass":5,"master":6,"pedal":"OFF|COMP|ACOUSTIC|AUTO WAH|U-VIBE|BRN OCTAVE|TREBLE BOOST|TUBE OD|GOLD DRIVE|ORG DIST|METAL DIST|FUZZ","pedalOn":false,"pedalValue":5,"modType":"OFF|CE CHORUS|MULTI CHORUS|FLANGER|ORG PHASE|TWIN TREM|G4 ROTARY|PITCH SHIFT|FILTRON|TAPE ECHO|DELAY|CHORUS+DELAY","modOn":false,"modDepth":0,"modSpeed":0,"delayOn":false,"delayTime":300,"delayFb":30,"reverb":"OFF|ROOM|SPRING|HALL","reverbOn":false,"reverbMix":20,"powerLevel":3,"guitar":{"pickup":4,"tone":7,"tone2":7,"volume":10,"note":"note courte réglages guitare — tone=TONE 1 (micro manche), tone2=TONE 2 (micro chevalet) ; micros nommés en toutes lettres"},"guitarNote":"note courte adaptée Strat single-coil Texas Special","extPedals":[{"icon":"emoji","name":"nom pédale","desc":"description","params":[{"n":"NOM","v":5}],"opt":false}],"tip":"💡 <strong>Strat + médiator épais :</strong> conseil pratique","partName":"Riff / rythmique","parts":[{"name":"Solo","switchHint":"comment passer d'une partie à l'autre en jouant","gain":7,"pedal":"TUBE OD","pedalOn":true,"pedalValue":4,"guitar":{"pickup":1,"tone":8,"tone2":7,"volume":10,"note":"…"},"tip":"…"}]}
 
 PEDAL effects (1 seul à la fois, knob VALUE règle paramètre principal) : COMP (SENS), ACOUSTIC (TONE), AUTO WAH (SENS), U-VIBE (SPEED), BRN OCTAVE (LEVEL), TREBLE BOOST (GAIN), TUBE OD (GAIN), GOLD DRIVE (GAIN), ORG DIST (GAIN), METAL DIST (GAIN), FUZZ (GAIN).
 MOD/DELAY effects (1 seul à la fois, knobs DEPTH + TAP/SPEED) : CE CHORUS, MULTI CHORUS, FLANGER, ORG PHASE, TWIN TREM, G4 ROTARY, PITCH SHIFT, FILTRON, TAPE ECHO (40-1048ms), DELAY (40-1048ms), CHORUS+DELAY.
 REVERB types : ROOM, SPRING, HALL.
 
-Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé", artist="Essaie un autre titre", valeurs neutres.
+═══ PARTIES DU MORCEAU (couplet / refrain / solo…) ═══
+Beaucoup de morceaux n'ont pas UN son mais plusieurs (intro claire puis refrain saturé, rythmique puis solo au micro manche…). Un seul réglage moyen sonne « à peu près » partout et juste nulle part.
+• Les champs de premier niveau = la partie PRINCIPALE (celle qu'on entend le plus, souvent le riff/la rythmique). Nomme-la dans "partName" (court : "Riff", "Couplet clair", "Rythmique"…).
+• "parts" = 0 à 2 parties SUPPLÉMENTAIRES dont le son diffère VRAIMENT (solo, refrain saturé, intro clean…). Si le son est le même tout le long → "parts": [].
+• Dans chaque partie, ne mets QUE les champs qui changent par rapport à la principale (les autres sont hérités) + "name" + "switchHint".
+• Privilégie les changements jouables en plein morceau : sélecteur de micro, volume/tone guitare, pédale externe. Changer des potards de l'ampli au milieu du morceau est peu pratique — fais-le seulement si c'est indispensable, et dis-le dans switchHint.
+• factoryPreset dans une partie : true seulement si le programme d'usine reste inchangé (seule la guitare change).
 
 VALIDATION DES PLAGES NUMÉRIQUES (impératif) :
 • gain, volume, treble, middle, bass, master ∈ [0, 10] entier
@@ -1782,8 +1852,124 @@ VALIDATION DES PLAGES NUMÉRIQUES (impératif) :
 • delayTime ∈ [40, 1048] (ms)
 • delayFb ∈ [0, 100]
 • pickup ∈ {1, 2, 3, 4, 5}, tone, tone2, volume guitare ∈ [0, 10]
-• powerLevel ∈ [1, 30] entier (potard continu)
+• powerLevel ∈ [1, 30] entier (potard continu)`;
 
+/* ── PROFIL D'ÉCOUTE (mémoire des corrections) ─────── */
+const FEEDBACK_LS = 'vox_feedback_log';
+const FEEDBACK_MAX = 30;
+const getFeedbackLog = () => { try { const a = JSON.parse(localStorage.getItem(FEEDBACK_LS) || '[]'); return Array.isArray(a) ? a : []; } catch { return []; } };
+const saveFeedbackLog = log => { try { localStorage.setItem(FEEDBACK_LS, JSON.stringify(log.slice(0, FEEDBACK_MAX))); } catch {} renderProfile(); };
+function logFeedback(preset, partIdx, text) {
+  const v = partView(preset, partIdx);
+  const log = getFeedbackLog();
+  log.unshift({
+    date: new Date().toISOString().slice(0, 10),
+    song: `${preset.title} — ${preset.artist}`,
+    part: partLabel(preset, partIdx),
+    amp: `${v.ampModel} ${v.bank || 'STD'}`,
+    feedback: String(text).slice(0, 500)
+  });
+  saveFeedbackLog(log);
+}
+function buildPlayerProfile() {
+  const log = getFeedbackLog();
+  if (!log.length) return '';
+  return `
+═══ PROFIL D'ÉCOUTE DU JOUEUR (ses corrections passées, sur SON ampli dans SA pièce) ═══
+Après avoir testé des presets en vrai, le joueur a fait ces retours (du plus récent au plus ancien). Repère les TENDANCES qui reviennent sur plusieurs morceaux (ex : trouve souvent le son trop brillant, veut toujours plus de crunch, reverb trop présente…) : elles révèlent son ampli, sa pièce et son oreille → applique-les d'emblée. Ignore ce qui ne concerne qu'un seul morceau.
+${log.map(e => `• [${e.date}] ${e.song} (${e.amp}, partie « ${e.part} ») : ${String(e.feedback).replace(/\s+/g, ' ')}`).join('\n')}
+`;
+}
+function renderProfile() {
+  const log = getFeedbackLog();
+  const box = document.getElementById('profileBox');
+  if (!box) return;
+  box.style.display = log.length ? 'flex' : 'none';
+  document.getElementById('profileCount').textContent = `${log.length} correction${log.length > 1 ? 's' : ''} mémorisée${log.length > 1 ? 's' : ''}`;
+  document.getElementById('profileList').innerHTML = log.map((e, i) => `
+    <div class="profile-item"><div><small>${escapeHtml(e.date)} · ${escapeHtml(e.song)} · ${escapeHtml(e.part)}</small>${escapeHtml(e.feedback)}</div>
+    <button onclick="forgetFeedback(${i})" title="Oublier cette correction">✕</button></div>`).join('');
+}
+function toggleProfile() {
+  const l = document.getElementById('profileList');
+  const open = l.style.display === 'none';
+  l.style.display = open ? 'flex' : 'none';
+  document.getElementById('profileToggle').textContent = open ? 'Masquer' : 'Voir';
+}
+function forgetFeedback(i) {
+  const log = getFeedbackLog();
+  log.splice(i, 1);
+  saveFeedbackLog(log);
+}
+function clearProfile() {
+  if (!confirm("Oublier toutes tes corrections passées ? L'IA ne s'en servira plus pour calibrer les nouveaux presets.")) return;
+  saveFeedbackLog([]);
+  toast("Profil d'écoute effacé");
+}
+
+/* ── OPENAI SEARCH ────────────────────────────────── */
+// Modèle OpenAI + raisonnement poussé + recherche web
+// (pour vérifier le vrai matos/réglages du morceau au lieu de deviner).
+// gpt-6.1-sol = quasi le niveau de gpt-6-astra pour ~5× moins cher.
+// Encore plus précis (mais ~5× plus cher) : 'gpt-6-astra'.
+const OPENAI_MODEL = 'gpt-6.1-sol';
+const OPENAI_EFFORT = 'high';
+
+async function callOpenAI(k, sys, user) {
+  const res = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + k },
+    body: JSON.stringify({
+      model: OPENAI_MODEL,
+      reasoning: { effort: OPENAI_EFFORT },
+      tools: [{ type: "web_search" }],
+      instructions: sys,
+      input: user
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  const raw = (data.output || [])
+    .filter(o => o.type === 'message')
+    .flatMap(o => o.content || [])
+    .filter(c => c.type === 'output_text')
+    .map(c => c.text).join('\n');
+  const start = raw.indexOf('{'), end = raw.lastIndexOf('}');
+  if (start < 0 || end <= start) throw new Error('Réponse GPT sans JSON');
+  return JSON.parse(raw.slice(start, end + 1));
+}
+
+async function searchSong() {
+  const inp = document.getElementById('aiInp'), q = inp.value.trim();
+  if (!q) return;
+  const k = getKey();
+  if (!k) { showErr('Clé OpenAI manquante.'); return; }
+  const btn = document.getElementById('goBtn'), loadEl = document.getElementById('loadEl'), errEl = document.getElementById('errEl');
+  btn.disabled = true; loadEl.classList.add('on'); errEl.classList.remove('on');
+
+  const sys = `Tu es un expert en son de guitare et en amplificateur VOX VT20+ (combo 30W, HP 8", lampe 12AX7 Valve Reactor).
+${GUITAR_CTX}
+
+${VT20_CTX}
+
+═══ EXEMPLES (few-shot, pour calibrer ton raisonnement) ═══
+
+EXEMPLE 1 — entrée : "Back in Black, AC/DC"
+Raisonnement (NE PAS METTRE DANS LA RÉPONSE) : Ce morceau est DANS la liste des 33 SONG presets factory du VT20+ → US 2x12 CST (LED bank rouge). Donc factoryPreset=true. Le VT20+ charge ses propres GAIN/VOLUME/EQ — j'indique quand même des valeurs cohérentes comme garde-fou si l'utilisateur passe en MANUAL. Angus Young joue SG/humbucker, pour Strat compenser : MIDDLE haut, micro milieu + chevalet ou chevalet (TONE 2 vers 7 pour arrondir).
+Sortie correcte : ampModel="US 2x12", bank="CST", factoryPreset=true, ampReal="Fender Twin actif crunch modifié (preset factory VT20+ Back In Black)", gain≈6, volume≈7, treble≈7, middle≈7, bass≈5, master≈7, pedal="OFF", modOn=false, reverb="SPRING" mix 15-20, pickup=5, tones=8, volume guitare=10, powerLevel=3.
+
+EXEMPLE 2 — entrée : "Enter Sandman, Metallica"
+Raisonnement : Morceau dans la liste factory → UK METAL STD (LED bank vert). factoryPreset=true. Hetfield joue ESP humbucker → pour Strat NS-2 recommandé, MIDDLE bas (scooped), TREBLE haut.
+Sortie correcte : ampModel="UK METAL", bank="STD", factoryPreset=true, ampReal="Marshall JCM2000 100W (preset factory VT20+ Enter Sandman)", gain≈8, volume≈5, treble≈7, middle≈3, bass≈6, master≈6, pedal="TUBE OD" pedalOn=true VALUE 7, modOn=false, reverb="ROOM" mix 10, pickup=5, tones=10, volume guitare=10, NR SENS 6, NS-2 dans extPedals, powerLevel=3.
+
+EXEMPLE 3 (HORS LISTE FACTORY) — entrée : "Wish You Were Here, Pink Floyd"
+Raisonnement : N'est PAS dans les 33 SONG presets factory. factoryPreset=false → mode MANUAL. Gilmour joue Strat en clean breakup avec léger crunch, son aérien. UK ROCK STD (JTM45 tweed) ou VOX AC30 STD selon goût.
+Sortie correcte : ampModel="UK ROCK", bank="STD", factoryPreset=false, gain≈4, volume≈6, treble≈6, middle≈5, bass≈5, master≈6, reverb="HALL" mix 30, pickup=1 (manche pour solo), tones=7, powerLevel=3.
+
+═══ FIN DES EXEMPLES ═══
+
+Si morceau introuvable ou sans guitare électrique, title="Morceau non trouvé", artist="Essaie un autre titre", valeurs neutres.
+${buildPlayerProfile()}
 PROCESSUS DE RAISONNEMENT (silencieux, n'apparaît PAS dans la réponse) :
 
 ⚡ ÉTAPE 0 — MATCH FACTORY EN PREMIER (avant tout le reste) :
@@ -1793,36 +1979,21 @@ c) Le morceau est-il très proche d'un des 33 (autre version live/studio du mêm
 d) Si AUCUN match ≥ 80 % → factoryPreset=false, et seulement maintenant continue avec les étapes 1-6 ci-dessous pour calculer les réglages MANUEL.
 
 ÉTAPES SUIVANTES (uniquement si factoryPreset=false) :
-1. Identifie la guitare originale et l'ampli original du morceau
+1. RECHERCHE WEB OBLIGATOIRE : vérifie le matériel réellement utilisé sur l'enregistrement studio du morceau (guitare, micro, ampli, pédales, réglages connus) — interviews, Equipboard, Guitar World, Premier Guitar, forums, rig rundowns. Ne te fie pas à ta mémoire seule ; croise plusieurs sources et privilégie la version studio la plus connue.
 2. Choisis le modèle VT20+ qui modélise (ou approche le mieux) l'ampli ORIGINAL du morceau. NE PAS détourner un preset factory comme raccourci si le match est < 80 % — choisis l'ampModel/bank historiquement correct.
 3. Détermine si le crunch/saturation vient historiquement du préampli poussé ou d'une pédale (chaîne signal)
 4. Adapte les valeurs en pondérant les principes ci-dessus selon le contexte du morceau
 5. Choisis powerLevel = 3 par défaut (le joueur joue en appart à ~3W), sauf morceau qui ne peut sonner qu'à fort volume (rare → 15-30)
 6. Vérifie cohérence globale + plages valides avant d'émettre
 
-Réponds ensuite UNIQUEMENT avec le JSON final.`;
+DANS TOUS LES CAS (factory ou manuel) :
+7. Découpe le morceau en parties si le son de guitare change vraiment (voir PARTIES DU MORCEAU) — sinon "parts": [].
+8. Si un PROFIL D'ÉCOUTE DU JOUEUR est fourni, applique ses tendances récurrentes à tous les réglages manuels.
+
+Réponds ensuite UNIQUEMENT avec le JSON final (pas de markdown, pas de texte avant/après, aucun lien ni citation de source dans les valeurs).`;
 
   try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + k
-      },
-      body: JSON.stringify({
-        model: "gpt-5.5",
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: sys },
-          { role: "user", content: "Réglages VOX VT20+ adaptés à une Fender American Special Strat (single-coil Texas Special, médiator épais) pour le morceau : " + q }
-        ]
-      })
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const raw = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
-    const cleaned = raw.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
+    const parsed = await callOpenAI(k, sys, "Réglages VOX VT20+ adaptés à une Fender American Special Strat (single-coil Texas Special, médiator épais) pour le morceau : " + q);
     const preset = validatePreset(parsed);
     if (!preset) throw new Error('Réponse GPT invalide (modèle d\'ampli ou titre manquant)');
 
@@ -1879,32 +2050,29 @@ async function submitAdjust() {
 
 ${GUITAR_CTX}
 
-CONTRAINTES IDENTIQUES À UN PRESET NEUF :
-• Le joueur utilise le VT20+ en appartement (~3W). POWER LEVEL reste un atténuateur — ne sous-dimensionne pas le crunch.
-• Chaîne signal : GUITARE → PEDAL → AMP MODEL → MOD/DELAY → REVERB → HP 8".
-• Modèles d'ampli VT20+ disponibles : CLEAN, CALI CLEAN, US BLUES, US 2x12, VOX AC15, VOX AC30, UK ROCK, UK METAL, US HIGH GAIN, US METAL, BOUTIQUE METAL. Chacun a 3 banques STD/SPL/CST.
-• Plages valides : gain/volume/treble/middle/bass/master ∈ [0,10] ; pedalValue ∈ [0,10] (knob façade VT20+) ; modDepth/modSpeed/reverbMix ∈ [0,100] ; delayTime ∈ [40,1048] ms ; delayFb ∈ [0,100] ; pickup ∈ {1,2,3,4,5} ; tone/tone2/volume guitare ∈ [0,10] ; powerLevel ∈ [1,30].
-• PEDAL : OFF, COMP, ACOUSTIC, AUTO WAH, U-VIBE, BRN OCTAVE, TREBLE BOOST, TUBE OD, GOLD DRIVE, ORG DIST, METAL DIST, FUZZ.
-• MOD/DELAY : OFF, CE CHORUS, MULTI CHORUS, FLANGER, ORG PHASE, TWIN TREM, G4 ROTARY, PITCH SHIFT, FILTRON, TAPE ECHO, DELAY, CHORUS+DELAY.
-• REVERB : OFF, ROOM, SPRING, HALL.
-• Conserve le champ factoryPreset tel qu'il est (true uniquement si le preset correspond à un des 33 SONG presets pré-stockés en usine). Si le feedback indique un changement d'ampli majeur qui s'éloigne du preset factory, passe-le à false.
+${VT20_CTX}
 
+• Conserve le champ factoryPreset tel qu'il est (true uniquement si le preset correspond à un des 33 SONG presets pré-stockés en usine). Si le feedback indique un changement d'ampli majeur qui s'éloigne du preset factory, passe-le à false.
+${buildPlayerProfile()}
 MÉTHODE D'AJUSTEMENT :
 1. Lis attentivement le feedback du joueur — il a essayé le preset en vrai. Son retour est plus fiable que ton intuition initiale.
-2. Si une référence YouTube est fournie, base-toi sur ta connaissance du son de ce morceau/version pour orienter les corrections.
+2. Si une référence YouTube est fournie, utilise la recherche web pour identifier la vidéo (titre, version live/studio, matériel visible ou cité) et oriente les corrections vers CE son-là. Sinon, recherche le matériel réel du morceau si ça aide à corriger.
 3. Modifie UNIQUEMENT ce qui sert le feedback. Ne change pas les paramètres déjà bons. Reste cohérent avec l'identité du preset (même ampli si possible, sauf si le feedback indique clairement que c'est l'ampli qui est en cause).
 4. Si le joueur dit "trop sombre" → monter TREBLE, monter tones guitare, micro plus chevalet, peut-être TREBLE BOOST.
 5. Si "manque de slapback / vintage" → activer MOD/DELAY en TAPE ECHO 80-150ms, feedback bas (10-25%).
 6. Si "pas assez de crunch" → monter GAIN ou VOLUME, ou ajouter une OD via PEDAL, ou changer banque.
 7. Si "trop saturé" → baisser GAIN, virer pédale OD, baisser volume guitare.
 8. Mets à jour aussi le \`tip\`, \`guitarNote\` et la \`guitar.note\` pour refléter les changements (le joueur lit ces conseils).
+9. PARTIES : le joueur te dit quelle partie il regardait. Si son feedback vise clairement une partie (« le solo est trop… »), corrige surtout celle-là. Si le feedback révèle qu'il manque une partie (« au refrain ça sature plus »), ajoute-la dans "parts" (max 2 parties supplémentaires). Garde les autres parties intactes.
 
-RÉPONSE : UNIQUEMENT le JSON complet du preset corrigé, même structure que l'entrée. Pas de markdown, pas de \`\`\`, pas de texte avant/après. Garde title et artist identiques.`;
+RÉPONSE : UNIQUEMENT le JSON complet du preset corrigé, même structure que l'entrée (partie principale au premier niveau + "partName" + "parts" complets). Pas de markdown, pas de \`\`\`, pas de texte avant/après, aucun lien ni citation de source dans les valeurs. Garde title et artist identiques.`;
 
   const user = `PRESET ACTUEL (à corriger) :
 \`\`\`json
 ${JSON.stringify(currentDisplay, null, 2)}
 \`\`\`
+
+PARTIE AFFICHÉE PAR LE JOUEUR : ${partLabel(currentDisplay, currentPart)}
 
 FEEDBACK DU JOUEUR (ce qui ne va pas / ce qu'il veut entendre) :
 ${feedback}
@@ -1912,27 +2080,13 @@ ${yt ? `\nRÉFÉRENCE YOUTUBE : ${yt}\n` : ''}
 Renvoie le preset ajusté en JSON complet.`;
 
   try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + k },
-      body: JSON.stringify({
-        model: "gpt-5.5",
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: sys },
-          { role: "user", content: user }
-        ]
-      })
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const raw = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
-    const cleaned = raw.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(cleaned);
+    const parsed = await callOpenAI(k, sys, user);
     const adjusted = validatePreset(parsed);
     if (!adjusted) throw new Error('Réponse GPT invalide (modèle d\'ampli ou titre manquant)');
     adjusted.adjustedFromKey = currentSource.type === 'factory' ? currentSource.key : (currentDisplay.adjustedFromKey || null);
     adjusted.adjustedAt = new Date().toISOString();
+    logFeedback(currentDisplay, currentPart, feedback);
+    const keepPart = Math.min(currentPart, adjusted.parts.length);
 
     const arr = getCustom();
     if (currentSource.type === 'custom' && typeof currentSource.index === 'number' && arr[currentSource.index]) {
@@ -1941,7 +2095,7 @@ Renvoie le preset ajusté en JSON complet.`;
       renderGrid();
       const el = document.querySelector(`.song-item[data-custom="${currentSource.index}"]`);
       if (el) el.classList.add('active');
-      render(adjusted);
+      render(adjusted, { part: keepPart });
       toast('✓ Preset ajusté');
     } else {
       if (!adjusted.title.toLowerCase().includes('ajusté')) adjusted.title = adjusted.title + ' (ajusté)';
@@ -1951,7 +2105,7 @@ Renvoie le preset ajusté en JSON complet.`;
       currentSource = { type:'custom', index:0 };
       const el = document.querySelector('.song-item[data-custom="0"]');
       if (el) el.classList.add('active');
-      render(adjusted);
+      render(adjusted, { part: keepPart });
       toast('✓ Version ajustée ajoutée à ta biblio');
     }
     closeAdjust();
